@@ -1,0 +1,37 @@
+import type { ApiResponse, ApiPaginatedRaw, PaginatedResponse } from '@/types/api';
+import { toPaginated } from '@/types/api';
+import type { User } from '@/types/models';
+import apiClient from './client';
+
+export interface UsersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  status?: string;
+}
+
+export async function getUsers(params: UsersParams = {}): Promise<PaginatedResponse<User>> {
+  const res = await apiClient.get<ApiPaginatedRaw<User>>('/admin/users', { params });
+  return toPaginated(res.data);
+}
+
+export async function getUserById(id: string): Promise<User> {
+  const res = await apiClient.get<ApiResponse<User>>(`/admin/users/${id}`);
+  return res.data.data;
+}
+
+export async function suspendUser(id: string): Promise<User> {
+  const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${id}/suspend`);
+  return res.data.data;
+}
+
+export async function banUser(id: string): Promise<User> {
+  const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${id}/ban`);
+  return res.data.data;
+}
+
+export async function activateUser(id: string): Promise<User> {
+  const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${id}/activate`);
+  return res.data.data;
+}

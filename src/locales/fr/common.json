@@ -1,0 +1,46 @@
+{
+  "appName": "Paper's Admin",
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "users": "Utilisateurs",
+    "authors": "Auteurs",
+    "books": "Livres",
+    "categories": "Catégories",
+    "transactions": "Transactions"
+  },
+  "actions": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "confirm": "Confirmer",
+    "approve": "Approuver",
+    "reject": "Rejeter",
+    "suspend": "Suspendre",
+    "ban": "Bannir",
+    "activate": "Activer",
+    "search": "Rechercher...",
+    "close": "Fermer"
+  },
+  "status": {
+    "active": "Actif",
+    "suspended": "Suspendu",
+    "banned": "Banni",
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "rejected": "Rejeté",
+    "draft": "Brouillon",
+    "published": "Publié"
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "showing": "Affichage de {{from}} à {{to}} sur {{total}}"
+  },
+  "table": {
+    "noData": "Aucune donnée disponible",
+    "loading": "Chargement..."
+  },
+  "logout": "Déconnexion"
+}
