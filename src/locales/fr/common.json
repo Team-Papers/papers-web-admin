@@ -23,7 +23,17 @@
     "promote": "Promouvoir en Admin",
     "demote": "Rétrograder",
     "search": "Rechercher...",
-    "close": "Fermer"
+    "close": "Fermer",
+    "createAdmin": "Créer un admin"
+  },
+  "createAdminPage": {
+    "title": "Créer un administrateur",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "passwordHint": "Minimum 8 caractères",
+    "success": "Administrateur créé avec succès"
   },
   "status": {
     "active": "Actif",

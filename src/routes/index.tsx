@@ -6,6 +6,7 @@ import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 import { UsersPage } from '@/features/users/pages/UsersPage';
 import { UserDetailPage } from '@/features/users/pages/UserDetailPage';
+import { CreateAdminPage } from '@/features/users/pages/CreateAdminPage';
 import { AuthorsPage } from '@/features/authors/pages/AuthorsPage';
 import { AuthorDetailPage } from '@/features/authors/pages/AuthorDetailPage';
 import { BooksPage } from '@/features/books/pages/BooksPage';
@@ -29,6 +30,7 @@ export function AppRoutes() {
         >
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/users/create-admin" element={<CreateAdminPage />} />
           <Route path="/users/:id" element={<UserDetailPage />} />
           <Route path="/authors" element={<AuthorsPage />} />
           <Route path="/authors/:id" element={<AuthorDetailPage />} />

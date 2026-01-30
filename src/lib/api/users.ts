@@ -45,3 +45,15 @@ export async function demoteFromAdmin(id: string): Promise<User> {
   const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${id}/demote`);
   return res.data.data;
 }
+
+export interface CreateAdminData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+export async function createAdmin(data: CreateAdminData): Promise<User> {
+  const res = await apiClient.post<ApiResponse<User>>('/admin/users/create-admin', data);
+  return res.data.data;
+}

@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/organisms/Header';
+import { Button } from '@/components/atoms/Button';
 import { SearchBar } from '@/components/molecules/SearchBar';
 import { DataTable, type Column } from '@/components/organisms/DataTable';
 import { Badge } from '@/components/atoms/Badge';
@@ -31,7 +32,8 @@ export function UsersPage() {
     <>
       <Header title={t('nav.users')} />
       <div className="p-6 space-y-4">
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Button onClick={() => navigate('/users/create-admin')}>{t('actions.createAdmin')}</Button>
           <div className="w-72">
             <SearchBar value={table.search} onChange={table.setSearch} />
           </div>
