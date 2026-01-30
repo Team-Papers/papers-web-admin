@@ -20,6 +20,8 @@
     "suspend": "Suspendre",
     "ban": "Bannir",
     "activate": "Activer",
+    "promote": "Promouvoir en Admin",
+    "demote": "Rétrograder",
     "search": "Rechercher...",
     "close": "Fermer"
   },

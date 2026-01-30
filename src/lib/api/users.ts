@@ -35,3 +35,13 @@ export async function activateUser(id: string): Promise<User> {
   const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${id}/activate`);
   return res.data.data;
 }
+
+export async function promoteToAdmin(id: string): Promise<User> {
+  const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${id}/promote`);
+  return res.data.data;
+}
+
+export async function demoteFromAdmin(id: string): Promise<User> {
+  const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${id}/demote`);
+  return res.data.data;
+}

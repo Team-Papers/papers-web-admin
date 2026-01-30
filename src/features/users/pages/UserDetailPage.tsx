@@ -7,10 +7,10 @@ import { Button } from '@/components/atoms/Button';
 import { Avatar } from '@/components/atoms/Avatar';
 import { Modal } from '@/components/molecules/Modal';
 import { Spinner } from '@/components/atoms/Spinner';
-import { getUserById, suspendUser, banUser, activateUser } from '@/lib/api/users';
+import { getUserById, suspendUser, banUser, activateUser, promoteToAdmin, demoteFromAdmin } from '@/lib/api/users';
 import { formatDate } from '@/lib/utils/formatters';
 import type { User } from '@/types/models';
-import { UserStatus } from '@/types/models';
+import { Role, UserStatus } from '@/types/models';
 
 const statusVariant = { [UserStatus.ACTIVE]: 'success', [UserStatus.SUSPENDED]: 'warning', [UserStatus.BANNED]: 'error' } as const;
 
@@ -19,7 +19,7 @@ export function UserDetailPage() {
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [confirmAction, setConfirmAction] = useState<'suspend' | 'ban' | 'activate' | null>(null);
+  const [confirmAction, setConfirmAction] = useState<'suspend' | 'ban' | 'activate' | 'promote' | 'demote' | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
@@ -30,8 +30,9 @@ export function UserDetailPage() {
     if (!id || !confirmAction) return;
     setActionLoading(true);
     try {
-      const actions = { suspend: suspendUser, ban: banUser, activate: activateUser };
-      const updated = await actions[confirmAction](id);
+      const actions = { suspend: suspendUser, ban: banUser, activate: activateUser, promote: promoteToAdmin, demote: demoteFromAdmin };
+      await actions[confirmAction](id);
+      const updated = await getUserById(id);
       setUser(updated);
     } finally {
       setActionLoading(false);
@@ -59,6 +60,12 @@ export function UserDetailPage() {
               <p className="mt-2 text-sm text-gray-500">Inscrit le {formatDate(user.createdAt)}</p>
             </div>
             <div className="flex gap-2">
+              {user.role !== Role.ADMIN && user.status === UserStatus.ACTIVE && (
+                <Button variant="primary" size="sm" onClick={() => setConfirmAction('promote')}>{t('actions.promote')}</Button>
+              )}
+              {user.role === Role.ADMIN && (
+                <Button variant="secondary" size="sm" onClick={() => setConfirmAction('demote')}>{t('actions.demote')}</Button>
+              )}
               {user.status !== UserStatus.ACTIVE && (
                 <Button variant="primary" size="sm" onClick={() => setConfirmAction('activate')}>{t('actions.activate')}</Button>
               )}
@@ -87,7 +94,7 @@ export function UserDetailPage() {
         }
       >
         <p className="text-sm text-gray-600">
-          Êtes-vous sûr de vouloir {confirmAction === 'suspend' ? 'suspendre' : confirmAction === 'ban' ? 'bannir' : 'activer'} {user.firstName} {user.lastName} ?
+          Êtes-vous sûr de vouloir {confirmAction === 'suspend' ? 'suspendre' : confirmAction === 'ban' ? 'bannir' : confirmAction === 'promote' ? 'promouvoir en admin' : confirmAction === 'demote' ? 'rétrograder' : 'activer'} {user.firstName} {user.lastName} ?
         </p>
       </Modal>
     </>
