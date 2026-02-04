@@ -34,3 +34,13 @@ export async function suspendBook(id: string): Promise<Book> {
   const res = await apiClient.put<ApiResponse<Book>>(`/admin/books/${id}/suspend`);
   return res.data.data;
 }
+
+export interface DownloadLinkResponse {
+  downloadUrl: string;
+  expiresAt: string;
+}
+
+export async function getBookDownloadLink(id: string): Promise<DownloadLinkResponse> {
+  const res = await apiClient.get<ApiResponse<DownloadLinkResponse>>(`/admin/books/${id}/download-link`);
+  return res.data.data;
+}

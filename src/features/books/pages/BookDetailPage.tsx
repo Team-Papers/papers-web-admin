@@ -7,7 +7,7 @@ import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
 import { Avatar } from '@/components/atoms/Avatar';
 import { Modal } from '@/components/molecules/Modal';
-import { getBookById, approveBook, suspendBook } from '@/lib/api/books';
+import { getBookById, approveBook, suspendBook, getBookDownloadLink } from '@/lib/api/books';
 import { RejectBookModal } from '../components/RejectBookModal';
 import { formatCurrency, formatDate } from '@/lib/utils/formatters';
 import type { Book, Category } from '@/types/models';
@@ -38,6 +38,8 @@ export function BookDetailPage() {
   const [rejectOpen, setRejectOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [fileLoading, setFileLoading] = useState(false);
 
   const fetchBook = () => {
     if (!id) return;
@@ -88,6 +90,23 @@ export function BookDetailPage() {
     }
   };
 
+  const handleOpenFile = async () => {
+    if (!book.fileUrl) return;
+    setFileLoading(true);
+    try {
+      const { downloadUrl } = await getBookDownloadLink(book.id);
+      // downloadUrl is like /api/v1/files/download?token=..., so use base URL without /api/v1
+      const baseUrl = apiBaseUrl.replace('/api/v1', '');
+      const fullUrl = `${baseUrl}${downloadUrl}`;
+      setFileUrl(fullUrl);
+      setPreviewOpen(true);
+    } catch (error) {
+      console.error('Failed to get download link:', error);
+    } finally {
+      setFileLoading(false);
+    }
+  };
+
   // Extract categories
   const categories: Category[] = (book.categories || []).map((c: Category | { category: Category }) =>
     'category' in c ? c.category : c
@@ -97,13 +116,8 @@ export function BookDetailPage() {
   const author = book.author;
   const authorUser = author?.user;
 
-  // Build file preview URL (for PDF)
-  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
-  const filePreviewUrl = book.fileUrl
-    ? `${apiBaseUrl.replace('/api/v1', '')}/media/books/${book.fileUrl}`
-    : null;
-
   // Build cover URL
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
   const coverUrl = book.coverUrl?.startsWith('http')
     ? book.coverUrl
     : book.coverUrl
@@ -205,8 +219,8 @@ export function BookDetailPage() {
               {/* Actions */}
               <div className="flex gap-2 pt-4">
                 {book.fileUrl && (
-                  <Button variant="secondary" onClick={() => setPreviewOpen(true)}>
-                    Voir le fichier
+                  <Button variant="secondary" onClick={handleOpenFile} disabled={fileLoading}>
+                    {fileLoading ? 'Chargement...' : 'Voir le fichier'}
                   </Button>
                 )}
                 {book.status === BookStatus.PENDING && (
@@ -341,14 +355,14 @@ export function BookDetailPage() {
       {/* File Preview Modal */}
       <Modal
         isOpen={previewOpen}
-        onClose={() => setPreviewOpen(false)}
+        onClose={() => { setPreviewOpen(false); setFileUrl(null); }}
         title={`Apercu: ${book.title}`}
         size="xl"
       >
         <div className="h-[70vh]">
-          {book.fileFormat?.toLowerCase() === 'pdf' && filePreviewUrl ? (
+          {book.fileFormat?.toLowerCase() === 'pdf' && fileUrl ? (
             <iframe
-              src={filePreviewUrl}
+              src={fileUrl}
               className="w-full h-full rounded border"
               title="PDF Preview"
             />
@@ -358,8 +372,8 @@ export function BookDetailPage() {
                 <p className="text-gray-500 mb-4">
                   Apercu non disponible pour ce format ({book.fileFormat || 'inconnu'})
                 </p>
-                {filePreviewUrl && (
-                  <Button variant="primary" onClick={() => window.open(filePreviewUrl, '_blank')}>
+                {fileUrl && (
+                  <Button variant="primary" onClick={() => window.open(fileUrl, '_blank')}>
                     Telecharger le fichier
                   </Button>
                 )}
