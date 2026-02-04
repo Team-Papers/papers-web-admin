@@ -91,6 +91,7 @@ export interface Book {
   price: number;
   status: BookStatus;
   rejectionReason?: string;
+  rejectionHistory?: Array<{ reason: string; date: string }>;
   previewPercent?: number;
   publishedAt?: string;
   authorId: string;

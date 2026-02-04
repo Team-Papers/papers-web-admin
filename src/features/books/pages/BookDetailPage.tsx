@@ -165,6 +165,21 @@ export function BookDetailPage() {
                 </div>
               )}
 
+              {/* Rejection History */}
+              {book.rejectionHistory && book.rejectionHistory.length > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <p className="text-sm font-medium text-amber-800 mb-2">Historique des rejets ({book.rejectionHistory.length})</p>
+                  <div className="space-y-2">
+                    {book.rejectionHistory.map((rejection, index) => (
+                      <div key={index} className="text-sm border-l-2 border-amber-300 pl-3">
+                        <p className="text-amber-700">{rejection.reason}</p>
+                        <p className="text-xs text-amber-600">{formatDate(rejection.date)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <p className="text-gray-600 whitespace-pre-line">{book.description || 'Pas de description'}</p>
 
               {/* Categories */}

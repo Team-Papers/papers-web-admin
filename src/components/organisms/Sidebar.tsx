@@ -20,7 +20,7 @@ export function Sidebar() {
   return (
     <aside className={cn('flex h-screen flex-col border-r border-gray-200 bg-white transition-all', collapsed ? 'w-16' : 'w-60')}>
       <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
-        {!collapsed && <img src="/logo.png" alt="Paper's" className="h-8" />}
+        {!collapsed && <img src="/logo.png" alt="Papers" className="h-8" />}
         <button onClick={() => setCollapsed(!collapsed)} className="text-gray-400 hover:text-gray-600">
           {collapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
         </button>
