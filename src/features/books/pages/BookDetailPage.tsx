@@ -97,7 +97,8 @@ export function BookDetailPage() {
       const { downloadUrl } = await getBookDownloadLink(book.id);
       // downloadUrl is like /api/v1/files/download?token=..., so use base URL without /api/v1
       const baseUrl = apiBaseUrl.replace('/api/v1', '');
-      const fullUrl = `${baseUrl}${downloadUrl}`;
+      // Add inline=true for PDF preview in browser
+      const fullUrl = `${baseUrl}${downloadUrl}&inline=true`;
       setFileUrl(fullUrl);
       setPreviewOpen(true);
     } catch (error) {
