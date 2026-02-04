@@ -158,7 +158,7 @@ export function BookDetailPage() {
                 <Badge variant={statusVariant[book.status]}>{statusLabels[book.status]}</Badge>
               </div>
 
-              {book.rejectionReason && (
+              {book.status === BookStatus.REJECTED && book.rejectionReason && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                   <p className="text-sm font-medium text-red-800">Motif du rejet :</p>
                   <p className="text-sm text-red-700">{book.rejectionReason}</p>
