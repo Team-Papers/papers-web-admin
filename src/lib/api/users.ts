@@ -46,6 +46,10 @@ export async function demoteFromAdmin(id: string): Promise<User> {
   return res.data.data;
 }
 
+export async function deleteUser(id: string): Promise<void> {
+  await apiClient.delete(`/admin/users/${id}`);
+}
+
 export interface CreateAdminData {
   firstName: string;
   lastName: string;

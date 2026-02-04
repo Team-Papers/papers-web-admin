@@ -1,83 +1,373 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/organisms/Header';
 import { Badge } from '@/components/atoms/Badge';
 import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
-import { getBooks, approveBook, suspendBook } from '@/lib/api/books';
+import { Avatar } from '@/components/atoms/Avatar';
+import { Modal } from '@/components/molecules/Modal';
+import { getBookById, approveBook, suspendBook } from '@/lib/api/books';
 import { RejectBookModal } from '../components/RejectBookModal';
 import { formatCurrency, formatDate } from '@/lib/utils/formatters';
-import type { Book } from '@/types/models';
+import type { Book, Category } from '@/types/models';
 import { BookStatus } from '@/types/models';
 
 const statusVariant = {
-  [BookStatus.DRAFT]: 'neutral', [BookStatus.PENDING]: 'warning',
-  [BookStatus.APPROVED]: 'success', [BookStatus.REJECTED]: 'error', [BookStatus.PUBLISHED]: 'info',
+  [BookStatus.DRAFT]: 'neutral',
+  [BookStatus.PENDING]: 'warning',
+  [BookStatus.APPROVED]: 'success',
+  [BookStatus.REJECTED]: 'error',
+  [BookStatus.PUBLISHED]: 'info',
 } as const;
+
+const statusLabels: Record<BookStatus, string> = {
+  [BookStatus.DRAFT]: 'Brouillon',
+  [BookStatus.PENDING]: 'En attente',
+  [BookStatus.APPROVED]: 'Approuvé',
+  [BookStatus.REJECTED]: 'Rejeté',
+  [BookStatus.PUBLISHED]: 'Publié',
+};
 
 export function BookDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [rejectOpen, setRejectOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const fetchBook = () => {
     if (!id) return;
     setLoading(true);
-    getBooks({ limit: 100 })
-      .then((res) => setBook(res.data.find((b) => b.id === id) || null))
+    getBookById(id)
+      .then(setBook)
+      .catch(() => setBook(null))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchBook(); }, [id]);
+  useEffect(() => {
+    fetchBook();
+  }, [id]);
 
-  if (loading) return <div className="flex h-full items-center justify-center"><Spinner size="lg" /></div>;
-  if (!book) return <div className="flex h-full items-center justify-center"><p className="text-gray-500">Livre introuvable</p></div>;
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
-  const handleApprove = async () => { await approveBook(book.id); fetchBook(); };
-  const handleSuspend = async () => { await suspendBook(book.id); fetchBook(); };
+  if (!book) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-gray-500">Livre introuvable</p>
+      </div>
+    );
+  }
+
+  const handleApprove = async () => {
+    setActionLoading(true);
+    try {
+      await approveBook(book.id);
+      fetchBook();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleSuspend = async () => {
+    setActionLoading(true);
+    try {
+      await suspendBook(book.id);
+      fetchBook();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Extract categories
+  const categories: Category[] = (book.categories || []).map((c: Category | { category: Category }) =>
+    'category' in c ? c.category : c
+  );
+
+  // Get author info
+  const author = book.author;
+  const authorUser = author?.user;
+
+  // Build file preview URL (for PDF)
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+  const filePreviewUrl = book.fileUrl
+    ? `${apiBaseUrl.replace('/api/v1', '')}/media/books/${book.fileUrl}`
+    : null;
+
+  // Build cover URL
+  const coverUrl = book.coverUrl?.startsWith('http')
+    ? book.coverUrl
+    : book.coverUrl
+      ? `${apiBaseUrl.replace('/api/v1', '')}${book.coverUrl}`
+      : null;
 
   return (
     <>
-      <Header title={book.title} />
+      <Header title="Détails du livre" />
       <div className="p-6 space-y-6">
+        {/* Book Info Card */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex gap-6">
-            {book.coverUrl ? (
-              <img src={book.coverUrl} alt={book.title} className="h-48 w-36 rounded-lg object-cover" />
-            ) : (
-              <div className="h-48 w-36 rounded-lg bg-gray-200" />
-            )}
-            <div className="flex-1 space-y-3">
-              <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold">{book.title}</h2>
-                <Badge variant={statusVariant[book.status]}>{t(`status.${book.status.toLowerCase()}`)}</Badge>
+            {/* Cover */}
+            <div className="flex-shrink-0">
+              {coverUrl ? (
+                <img
+                  src={coverUrl}
+                  alt={book.title}
+                  className="h-64 w-48 rounded-lg object-cover shadow-md cursor-pointer hover:opacity-90 transition"
+                  onClick={() => window.open(coverUrl, '_blank')}
+                />
+              ) : (
+                <div className="h-64 w-48 rounded-lg bg-gray-200 flex items-center justify-center">
+                  <span className="text-gray-400 text-sm">Pas de couverture</span>
+                </div>
+              )}
+            </div>
+
+            {/* Details */}
+            <div className="flex-1 space-y-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">{book.title}</h2>
+                  {book.slug && <p className="text-sm text-gray-500">/{book.slug}</p>}
+                </div>
+                <Badge variant={statusVariant[book.status]}>{statusLabels[book.status]}</Badge>
               </div>
-              <p className="text-gray-600">{book.description}</p>
-              {book.rejectionReason && <p className="text-sm text-error">Motif : {book.rejectionReason}</p>}
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
-                <div><p className="text-sm text-gray-500">Prix</p><p className="font-semibold">{formatCurrency(book.price)}</p></div>
-                <div><p className="text-sm text-gray-500">Ventes</p><p className="font-semibold">{book.totalSales ?? 0}</p></div>
-                <div><p className="text-sm text-gray-500">Publié le</p><p className="font-semibold">{formatDate(book.createdAt)}</p></div>
+
+              {book.rejectionReason && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-sm font-medium text-red-800">Motif du rejet :</p>
+                  <p className="text-sm text-red-700">{book.rejectionReason}</p>
+                </div>
+              )}
+
+              <p className="text-gray-600 whitespace-pre-line">{book.description || 'Pas de description'}</p>
+
+              {/* Categories */}
+              {categories.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <span
+                      key={cat.id}
+                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                    >
+                      {cat.icon} {cat.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+                <div>
+                  <p className="text-sm text-gray-500">Prix</p>
+                  <p className="font-semibold text-lg">{formatCurrency(book.price)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Ventes</p>
+                  <p className="font-semibold text-lg">{book._count?.purchases ?? book.totalSales ?? 0}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Avis</p>
+                  <p className="font-semibold text-lg">{book._count?.reviews ?? 0}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Format</p>
+                  <p className="font-semibold text-lg uppercase">{book.fileFormat || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Pages</p>
+                  <p className="font-semibold">{book.pageCount || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Langue</p>
+                  <p className="font-semibold uppercase">{book.language || 'FR'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">ISBN</p>
+                  <p className="font-semibold">{book.isbn || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Créé le</p>
+                  <p className="font-semibold">{formatDate(book.createdAt)}</p>
+                </div>
               </div>
+
+              {/* Actions */}
               <div className="flex gap-2 pt-4">
+                {book.fileUrl && (
+                  <Button variant="secondary" onClick={() => setPreviewOpen(true)}>
+                    Voir le fichier
+                  </Button>
+                )}
                 {book.status === BookStatus.PENDING && (
                   <>
-                    <Button variant="primary" onClick={handleApprove}>{t('actions.approve')}</Button>
-                    <Button variant="danger" onClick={() => setRejectOpen(true)}>{t('actions.reject')}</Button>
+                    <Button variant="primary" onClick={handleApprove} disabled={actionLoading}>
+                      {actionLoading ? 'Chargement...' : t('actions.approve')}
+                    </Button>
+                    <Button variant="danger" onClick={() => setRejectOpen(true)} disabled={actionLoading}>
+                      {t('actions.reject')}
+                    </Button>
                   </>
                 )}
                 {(book.status === BookStatus.APPROVED || book.status === BookStatus.PUBLISHED) && (
-                  <Button variant="secondary" onClick={handleSuspend}>{t('actions.suspend')}</Button>
+                  <Button variant="secondary" onClick={handleSuspend} disabled={actionLoading}>
+                    {actionLoading ? 'Chargement...' : t('actions.suspend')}
+                  </Button>
                 )}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Author Info Card */}
+        {author && (
+          <div className="rounded-lg border border-gray-200 bg-white p-6">
+            <h3 className="text-lg font-semibold mb-4">Informations sur l'auteur</h3>
+            <div className="flex items-start gap-4">
+              <Avatar
+                src={author.photoUrl || authorUser?.avatarUrl}
+                name={author.penName || `${authorUser?.firstName} ${authorUser?.lastName}`}
+                size="lg"
+              />
+              <div className="flex-1 space-y-2">
+                <div>
+                  <p className="font-semibold text-lg">
+                    {author.penName || `${authorUser?.firstName} ${authorUser?.lastName}`}
+                  </p>
+                  {authorUser && (
+                    <p className="text-sm text-gray-500">
+                      {authorUser.firstName} {authorUser.lastName} • {authorUser.email}
+                    </p>
+                  )}
+                </div>
+                {author.bio && <p className="text-gray-600 text-sm">{author.bio}</p>}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                  <div>
+                    <p className="text-xs text-gray-500">Statut</p>
+                    <Badge
+                      variant={
+                        author.status === 'APPROVED' ? 'success' : author.status === 'PENDING' ? 'warning' : 'error'
+                      }
+                    >
+                      {author.status}
+                    </Badge>
+                  </div>
+                  {author.balance !== undefined && (
+                    <div>
+                      <p className="text-xs text-gray-500">Solde</p>
+                      <p className="font-semibold">{formatCurrency(Number(author.balance))}</p>
+                    </div>
+                  )}
+                  {author.mtnNumber && (
+                    <div>
+                      <p className="text-xs text-gray-500">MTN</p>
+                      <p className="font-semibold">{author.mtnNumber}</p>
+                    </div>
+                  )}
+                  {author.omNumber && (
+                    <div>
+                      <p className="text-xs text-gray-500">Orange</p>
+                      <p className="font-semibold">{author.omNumber}</p>
+                    </div>
+                  )}
+                </div>
+                {authorUser && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => navigate(`/users/${authorUser.id}`)}
+                    className="mt-2"
+                  >
+                    Voir le profil utilisateur
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reviews Section */}
+        {book.reviews && book.reviews.length > 0 && (
+          <div className="rounded-lg border border-gray-200 bg-white p-6">
+            <h3 className="text-lg font-semibold mb-4">Derniers avis ({book.reviews.length})</h3>
+            <div className="space-y-4">
+              {book.reviews.map((review) => (
+                <div key={review.id} className="border-b border-gray-100 pb-4 last:border-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Avatar
+                      src={review.user?.avatarUrl}
+                      name={`${review.user?.firstName} ${review.user?.lastName}`}
+                      size="sm"
+                    />
+                    <div>
+                      <p className="font-medium text-sm">
+                        {review.user?.firstName} {review.user?.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500">{formatDate(review.createdAt)}</p>
+                    </div>
+                    <div className="ml-auto flex items-center gap-1">
+                      {'*'.repeat(review.rating)}
+                      <span className="text-sm text-gray-500">({review.rating}/5)</span>
+                    </div>
+                  </div>
+                  {review.comment && <p className="text-sm text-gray-600">{review.comment}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-      <RejectBookModal bookId={rejectOpen ? book.id : null} onClose={() => setRejectOpen(false)} onSuccess={() => { setRejectOpen(false); fetchBook(); }} />
+
+      {/* Reject Modal */}
+      <RejectBookModal
+        bookId={rejectOpen ? book.id : null}
+        onClose={() => setRejectOpen(false)}
+        onSuccess={() => {
+          setRejectOpen(false);
+          fetchBook();
+        }}
+      />
+
+      {/* File Preview Modal */}
+      <Modal
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        title={`Apercu: ${book.title}`}
+        size="xl"
+      >
+        <div className="h-[70vh]">
+          {book.fileFormat?.toLowerCase() === 'pdf' && filePreviewUrl ? (
+            <iframe
+              src={filePreviewUrl}
+              className="w-full h-full rounded border"
+              title="PDF Preview"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full bg-gray-100 rounded">
+              <div className="text-center">
+                <p className="text-gray-500 mb-4">
+                  Apercu non disponible pour ce format ({book.fileFormat || 'inconnu'})
+                </p>
+                {filePreviewUrl && (
+                  <Button variant="primary" onClick={() => window.open(filePreviewUrl, '_blank')}>
+                    Telecharger le fichier
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
     </>
   );
 }

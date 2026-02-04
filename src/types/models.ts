@@ -45,11 +45,19 @@ export interface AuthorProfile {
   id: string;
   userId: string;
   user?: User;
-  bio: string;
+  penName?: string;
+  bio?: string;
+  photoUrl?: string;
+  website?: string;
+  twitter?: string;
+  facebook?: string;
   status: AuthorStatus;
   rejectionReason?: string;
-  totalBooks: number;
-  totalRevenue: number;
+  mtnNumber?: string;
+  omNumber?: string;
+  balance?: number;
+  totalBooks?: number;
+  totalRevenue?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -71,17 +79,37 @@ export interface Category {
 export interface Book {
   id: string;
   title: string;
+  slug?: string;
   description: string;
   coverUrl?: string;
+  fileUrl?: string;
+  fileFormat?: string;
+  fileSize?: number;
+  pageCount?: number;
+  language?: string;
+  isbn?: string;
   price: number;
   status: BookStatus;
   rejectionReason?: string;
+  previewPercent?: number;
+  publishedAt?: string;
   authorId: string;
   author?: AuthorProfile;
-  categories?: Category[];
+  categories?: Category[] | { category: Category }[];
+  reviews?: Review[];
   totalSales: number;
+  _count?: { purchases: number; reviews: number };
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Review {
+  id: string;
+  rating: number;
+  comment?: string;
+  userId: string;
+  user?: { id: string; firstName: string; lastName: string; avatarUrl?: string };
+  createdAt: string;
 }
 
 export interface Transaction {

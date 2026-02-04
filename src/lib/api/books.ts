@@ -15,6 +15,11 @@ export async function getBooks(params: BooksParams = {}): Promise<PaginatedRespo
   return toPaginated(res.data);
 }
 
+export async function getBookById(id: string): Promise<Book> {
+  const res = await apiClient.get<ApiResponse<Book>>(`/admin/books/${id}`);
+  return res.data.data;
+}
+
 export async function approveBook(id: string): Promise<Book> {
   const res = await apiClient.put<ApiResponse<Book>>(`/admin/books/${id}/approve`);
   return res.data.data;

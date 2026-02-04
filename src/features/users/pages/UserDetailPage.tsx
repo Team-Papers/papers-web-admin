@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/organisms/Header';
 import { Badge } from '@/components/atoms/Badge';
@@ -7,7 +7,7 @@ import { Button } from '@/components/atoms/Button';
 import { Avatar } from '@/components/atoms/Avatar';
 import { Modal } from '@/components/molecules/Modal';
 import { Spinner } from '@/components/atoms/Spinner';
-import { getUserById, suspendUser, banUser, activateUser, promoteToAdmin, demoteFromAdmin } from '@/lib/api/users';
+import { getUserById, suspendUser, banUser, activateUser, promoteToAdmin, demoteFromAdmin, deleteUser } from '@/lib/api/users';
 import { formatDate } from '@/lib/utils/formatters';
 import type { User } from '@/types/models';
 import { Role, UserStatus } from '@/types/models';
@@ -16,10 +16,11 @@ const statusVariant = { [UserStatus.ACTIVE]: 'success', [UserStatus.SUSPENDED]: 
 
 export function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [confirmAction, setConfirmAction] = useState<'suspend' | 'ban' | 'activate' | 'promote' | 'demote' | null>(null);
+  const [confirmAction, setConfirmAction] = useState<'suspend' | 'ban' | 'activate' | 'promote' | 'demote' | 'delete' | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
@@ -30,6 +31,11 @@ export function UserDetailPage() {
     if (!id || !confirmAction) return;
     setActionLoading(true);
     try {
+      if (confirmAction === 'delete') {
+        await deleteUser(id);
+        navigate('/users');
+        return;
+      }
       const actions = { suspend: suspendUser, ban: banUser, activate: activateUser, promote: promoteToAdmin, demote: demoteFromAdmin };
       await actions[confirmAction](id);
       const updated = await getUserById(id);
@@ -75,6 +81,11 @@ export function UserDetailPage() {
               {user.status !== UserStatus.BANNED && (
                 <Button variant="danger" size="sm" onClick={() => setConfirmAction('ban')}>{t('actions.ban')}</Button>
               )}
+              {user.role !== Role.ADMIN && (
+                <Button variant="danger" size="sm" onClick={() => setConfirmAction('delete')}>
+                  Supprimer
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -83,18 +94,22 @@ export function UserDetailPage() {
       <Modal
         isOpen={!!confirmAction}
         onClose={() => setConfirmAction(null)}
-        title={`${t(`actions.${confirmAction || 'confirm'}`)} l'utilisateur ?`}
+        title={confirmAction === 'delete' ? 'Supprimer l\'utilisateur ?' : `${t(`actions.${confirmAction || 'confirm'}`)} l'utilisateur ?`}
         footer={
           <>
             <Button variant="secondary" onClick={() => setConfirmAction(null)}>{t('actions.cancel')}</Button>
-            <Button variant={confirmAction === 'ban' ? 'danger' : 'primary'} isLoading={actionLoading} onClick={handleAction}>
+            <Button variant={confirmAction === 'ban' || confirmAction === 'delete' ? 'danger' : 'primary'} isLoading={actionLoading} onClick={handleAction}>
               {t('actions.confirm')}
             </Button>
           </>
         }
       >
         <p className="text-sm text-gray-600">
-          Êtes-vous sûr de vouloir {confirmAction === 'suspend' ? 'suspendre' : confirmAction === 'ban' ? 'bannir' : confirmAction === 'promote' ? 'promouvoir en admin' : confirmAction === 'demote' ? 'rétrograder' : 'activer'} {user.firstName} {user.lastName} ?
+          {confirmAction === 'delete' ? (
+            <>Cette action est irréversible. Toutes les données de l'utilisateur seront supprimées définitivement.</>
+          ) : (
+            <>Êtes-vous sûr de vouloir {confirmAction === 'suspend' ? 'suspendre' : confirmAction === 'ban' ? 'bannir' : confirmAction === 'promote' ? 'promouvoir en admin' : confirmAction === 'demote' ? 'rétrograder' : 'activer'} {user.firstName} {user.lastName} ?</>
+          )}
         </p>
       </Modal>
     </>
