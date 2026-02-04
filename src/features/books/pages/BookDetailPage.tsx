@@ -360,21 +360,29 @@ export function BookDetailPage() {
         title={`Apercu: ${book.title}`}
         size="xl"
       >
-        <div className="h-[70vh]">
-          {book.fileFormat?.toLowerCase() === 'pdf' && fileUrl ? (
-            <iframe
-              src={fileUrl}
-              className="w-full h-full rounded border"
-              title="PDF Preview"
-            />
+        <div className="flex flex-col h-[75vh]">
+          {/* Check if PDF by format field or by file extension */}
+          {(book.fileFormat?.toLowerCase() === 'pdf' || book.fileUrl?.toLowerCase().endsWith('.pdf')) && fileUrl ? (
+            <>
+              <iframe
+                src={fileUrl}
+                className="w-full flex-1 rounded border"
+                title="PDF Preview"
+              />
+              <div className="mt-4 flex justify-center">
+                <Button variant="secondary" onClick={() => window.open(fileUrl.replace('&inline=true', ''), '_blank')}>
+                  Telecharger le PDF
+                </Button>
+              </div>
+            </>
           ) : (
             <div className="flex items-center justify-center h-full bg-gray-100 rounded">
               <div className="text-center">
                 <p className="text-gray-500 mb-4">
-                  Apercu non disponible pour ce format ({book.fileFormat || 'inconnu'})
+                  Apercu non disponible pour ce format ({book.fileFormat || book.fileUrl?.split('.').pop() || 'inconnu'})
                 </p>
                 {fileUrl && (
-                  <Button variant="primary" onClick={() => window.open(fileUrl, '_blank')}>
+                  <Button variant="primary" onClick={() => window.open(fileUrl.replace('&inline=true', ''), '_blank')}>
                     Telecharger le fichier
                   </Button>
                 )}
