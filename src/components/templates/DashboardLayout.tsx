@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router';
 import { Sidebar } from '@/components/organisms/Sidebar';
+import { CommandPalette } from '@/components/organisms/CommandPalette';
 
 export function DashboardLayout() {
   return (
@@ -10,6 +11,7 @@ export function DashboardLayout() {
           <Outlet />
         </main>
       </div>
+      <CommandPalette />
     </div>
   );
 }
