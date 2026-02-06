@@ -3,16 +3,18 @@ import { cn } from '@/lib/utils/cn';
 import { Spinner } from './Spinner';
 
 const variants = {
-  primary: 'bg-primary-400 text-white hover:bg-primary-500',
-  secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-  danger: 'bg-error text-white hover:bg-red-600',
-  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100',
+  primary: 'bg-primary text-white hover:bg-primary-600 shadow-sm hover:shadow-lg glow-primary-hover',
+  secondary: 'bg-surface-container text-on-surface hover:bg-surface-container-high',
+  danger: 'bg-error text-white hover:bg-red-600 shadow-sm',
+  ghost: 'bg-transparent text-on-surface-variant hover:bg-surface-container',
+  outline: 'border border-outline text-primary bg-transparent hover:bg-primary-container/30 hover:border-primary-300',
+  accent: 'bg-accent text-white hover:bg-accent-700 shadow-sm',
 } as const;
 
 const sizes = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-6 py-3 text-base',
+  sm: 'h-8 px-3 text-xs gap-1.5 rounded-lg',
+  md: 'h-10 px-5 text-sm gap-2 rounded-xl',
+  lg: 'h-12 px-6 text-base gap-2 rounded-xl',
 } as const;
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -21,6 +23,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
+  fullWidth?: boolean;
 }
 
 export function Button({
@@ -29,6 +32,7 @@ export function Button({
   isLoading,
   leftIcon,
   rightIcon,
+  fullWidth,
   children,
   className,
   disabled,
@@ -37,9 +41,10 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+        'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:opacity-40 disabled:pointer-events-none',
         variants[variant],
         sizes[size],
+        fullWidth && 'w-full',
         className,
       )}
       disabled={disabled || isLoading}
