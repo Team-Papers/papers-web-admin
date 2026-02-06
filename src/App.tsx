@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { AppRoutes } from '@/routes';
+import { ToastProvider } from '@/providers/ToastProvider';
 import '@/locales/i18n';
 
 export default function App() {
@@ -10,5 +11,9 @@ export default function App() {
     checkAuth();
   }, [checkAuth]);
 
-  return <AppRoutes />;
+  return (
+    <ToastProvider>
+      <AppRoutes />
+    </ToastProvider>
+  );
 }
