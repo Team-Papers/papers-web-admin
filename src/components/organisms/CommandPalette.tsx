@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import {
   Search,
   LayoutDashboard,
@@ -8,10 +7,8 @@ import {
   PenTool,
   BookOpen,
   Receipt,
-  Settings,
   Moon,
   Sun,
-  LogOut,
   Command,
 } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
@@ -31,7 +28,6 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
 
   const commands: CommandItem[] = [

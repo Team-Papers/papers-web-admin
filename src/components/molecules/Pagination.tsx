@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/atoms/Button';
-import { useTranslation } from 'react-i18next';
 
 interface PaginationProps {
   page: number;
@@ -11,7 +10,6 @@ interface PaginationProps {
 }
 
 export function Pagination({ page, totalPages, total, limit, onPageChange }: PaginationProps) {
-  const { t } = useTranslation();
   const from = (page - 1) * limit + 1;
   const to = Math.min(page * limit, total);
 
