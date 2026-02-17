@@ -11,7 +11,9 @@ export interface BooksParams {
 }
 
 export async function getBooks(params: BooksParams = {}): Promise<PaginatedResponse<Book>> {
-  const res = await apiClient.get<ApiPaginatedRaw<Book>>('/admin/books', { params });
+  const { search, ...rest } = params;
+  const query = { ...rest, ...(search ? { q: search } : {}) };
+  const res = await apiClient.get<ApiPaginatedRaw<Book>>('/admin/books', { params: query });
   return toPaginated(res.data);
 }
 

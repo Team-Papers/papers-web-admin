@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus, Trash2, Search } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Plus, Trash2, Search, BookOpen } from 'lucide-react';
 import { Modal } from '@/components/molecules/Modal';
 import { Button } from '@/components/atoms/Button';
 import { getBooks } from '@/lib/api/books';
@@ -13,32 +13,63 @@ interface Props {
   onUpdate: () => void;
 }
 
+function getAuthorName(book: Book): string {
+  if (book.author?.penName) return book.author.penName;
+  if (book.author?.user) {
+    return `${book.author.user.firstName ?? ''} ${book.author.user.lastName ?? ''}`.trim();
+  }
+  return '';
+}
+
+function getCategoryName(book: Book): string {
+  if (!book.categories || book.categories.length === 0) return '';
+  const first = book.categories[0];
+  if ('category' in first && first.category) return first.category.name;
+  if ('name' in first) return (first as { name: string }).name;
+  return '';
+}
+
 export function CollectionBooksManager({ isOpen, collection, onClose, onUpdate }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Book[]>([]);
-  const [searching, setSearching] = useState(false);
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(false);
   const [adding, setAdding] = useState<string | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
 
-  const collectionBookIds = new Set(collection?.books?.map((cb) => cb.bookId) || []);
+  const collectionBookIds = useMemo(
+    () => new Set(collection?.books?.map((cb) => cb.bookId) || []),
+    [collection?.books]
+  );
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      loadBooks();
+    } else {
       setSearchQuery('');
-      setSearchResults([]);
+      setAllBooks([]);
     }
   }, [isOpen]);
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    setSearching(true);
+  const loadBooks = async () => {
+    setLoading(true);
     try {
-      const result = await getBooks({ search: searchQuery, limit: 20, status: 'PUBLISHED' });
-      setSearchResults(result.data);
+      const result = await getBooks({ limit: 100, status: 'PUBLISHED' });
+      setAllBooks(result.data);
     } finally {
-      setSearching(false);
+      setLoading(false);
     }
   };
+
+  const filteredBooks = useMemo(() => {
+    if (!searchQuery.trim()) return allBooks;
+    const q = searchQuery.toLowerCase();
+    return allBooks.filter((book) => {
+      const title = book.title.toLowerCase();
+      const author = getAuthorName(book).toLowerCase();
+      const category = getCategoryName(book).toLowerCase();
+      return title.includes(q) || author.includes(q) || category.includes(q);
+    });
+  }, [allBooks, searchQuery]);
 
   const handleAdd = async (bookId: string) => {
     if (!collection) return;
@@ -73,89 +104,105 @@ export function CollectionBooksManager({ isOpen, collection, onClose, onUpdate }
       }
     >
       <div className="space-y-4">
-        {/* Current books */}
-        <div>
-          <h4 className="mb-2 text-sm font-semibold text-gray-700">
-            Livres dans la collection ({collection?.books?.length || 0})
-          </h4>
-          <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-gray-200">
-            {collection?.books?.length === 0 && (
-              <p className="px-4 py-6 text-center text-sm text-gray-500">Aucun livre dans cette collection</p>
-            )}
-            {collection?.books?.map((cb) => (
-              <div key={cb.bookId} className="flex items-center justify-between px-4 py-2 hover:bg-gray-50">
-                <div className="flex items-center gap-3">
-                  {cb.book?.coverUrl && (
-                    <img src={cb.book.coverUrl} alt="" className="h-10 w-7 rounded object-cover" />
-                  )}
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{cb.book?.title || cb.bookId}</p>
-                    <p className="text-xs text-gray-500">{cb.book?.price} FCFA</p>
+        {/* Current books in collection */}
+        {collection?.books && collection.books.length > 0 && (
+          <div>
+            <h4 className="mb-2 text-sm font-semibold text-on-surface">
+              Dans la collection ({collection.books.length})
+            </h4>
+            <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-outline-variant">
+              {collection.books.map((cb) => (
+                <div key={cb.bookId} className="flex items-center justify-between px-4 py-2 hover:bg-surface-container">
+                  <div className="flex items-center gap-3">
+                    {cb.book?.coverUrl ? (
+                      <img src={cb.book.coverUrl} alt="" className="h-10 w-7 rounded object-cover" />
+                    ) : (
+                      <div className="flex h-10 w-7 items-center justify-center rounded bg-surface-container">
+                        <BookOpen size={12} className="text-on-surface-variant" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-on-surface">{cb.book?.title || cb.bookId}</p>
+                      <p className="text-xs text-on-surface-variant">{cb.book?.price} FCFA</p>
+                    </div>
                   </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    isLoading={removing === cb.bookId}
+                    onClick={() => handleRemove(cb.bookId)}
+                  >
+                    <Trash2 size={14} className="text-red-500" />
+                  </Button>
                 </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  isLoading={removing === cb.bookId}
-                  onClick={() => handleRemove(cb.bookId)}
-                >
-                  <Trash2 size={14} className="text-red-500" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Search & add */}
-        <div>
-          <h4 className="mb-2 text-sm font-semibold text-gray-700">Ajouter des livres</h4>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Rechercher un livre..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full rounded-md border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              />
+              ))}
             </div>
-            <Button size="sm" isLoading={searching} onClick={handleSearch}>Chercher</Button>
+          </div>
+        )}
+
+        {/* Search & available books */}
+        <div>
+          <h4 className="mb-2 text-sm font-semibold text-on-surface">Ajouter des livres</h4>
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+            <input
+              type="text"
+              placeholder="Filtrer par titre, auteur ou categorie..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-lg border border-outline-variant bg-surface py-2 pl-9 pr-3 text-sm text-on-surface placeholder-on-surface-variant focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
           </div>
 
-          {searchResults.length > 0 && (
-            <div className="mt-2 max-h-48 space-y-1 overflow-y-auto rounded-lg border border-gray-200">
-              {searchResults.map((book) => {
+          <div className="mt-2 max-h-72 space-y-1 overflow-y-auto rounded-lg border border-outline-variant">
+            {loading ? (
+              <p className="px-4 py-8 text-center text-sm text-on-surface-variant">Chargement...</p>
+            ) : filteredBooks.length === 0 ? (
+              <p className="px-4 py-8 text-center text-sm text-on-surface-variant">Aucun livre trouve</p>
+            ) : (
+              filteredBooks.map((book) => {
                 const alreadyAdded = collectionBookIds.has(book.id);
+                const authorName = getAuthorName(book);
+                const categoryName = getCategoryName(book);
                 return (
-                  <div key={book.id} className="flex items-center justify-between px-4 py-2 hover:bg-gray-50">
-                    <div className="flex items-center gap-3">
-                      {book.coverUrl && (
-                        <img src={book.coverUrl} alt="" className="h-10 w-7 rounded object-cover" />
+                  <div key={book.id} className="flex items-center justify-between px-4 py-2.5 hover:bg-surface-container">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      {book.coverUrl ? (
+                        <img src={book.coverUrl} alt="" className="h-12 w-8 flex-shrink-0 rounded object-cover" />
+                      ) : (
+                        <div className="flex h-12 w-8 flex-shrink-0 items-center justify-center rounded bg-surface-container">
+                          <BookOpen size={14} className="text-on-surface-variant" />
+                        </div>
                       )}
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{book.title}</p>
-                        <p className="text-xs text-gray-500">{book.price} FCFA</p>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-on-surface truncate">{book.title}</p>
+                        <p className="text-xs text-on-surface-variant truncate">
+                          {authorName}
+                          {categoryName && ` · ${categoryName}`}
+                        </p>
+                        <p className="text-xs text-on-surface-variant">{book.price} FCFA</p>
                       </div>
                     </div>
                     {alreadyAdded ? (
-                      <span className="text-xs text-gray-400">Déjà ajouté</span>
+                      <span className="ml-2 flex-shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                        Ajoute
+                      </span>
                     ) : (
                       <Button
                         size="sm"
                         variant="ghost"
                         isLoading={adding === book.id}
                         onClick={() => handleAdd(book.id)}
+                        className="ml-2 flex-shrink-0"
                       >
-                        <Plus size={14} className="text-primary-500" />
+                        <Plus size={16} className="text-primary" />
                       </Button>
                     )}
                   </div>
                 );
-              })}
-            </div>
-          )}
+              })
+            )}
+          </div>
         </div>
       </div>
     </Modal>
