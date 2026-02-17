@@ -104,6 +104,20 @@ export interface Book {
   updatedAt: string;
 }
 
+export interface Collection {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  imageUrl?: string;
+  orderIndex: number;
+  isActive: boolean;
+  _count?: { books: number };
+  books?: Array<{ bookId: string; orderIndex: number; book?: Book }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Review {
   id: string;
   rating: number;

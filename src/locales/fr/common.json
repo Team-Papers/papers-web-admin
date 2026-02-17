@@ -6,6 +6,7 @@
     "authors": "Auteurs",
     "books": "Livres",
     "categories": "Catégories",
+    "collections": "Collections",
     "transactions": "Transactions"
   },
   "actions": {

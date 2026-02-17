@@ -12,6 +12,7 @@ import { AuthorDetailPage } from '@/features/authors/pages/AuthorDetailPage';
 import { BooksPage } from '@/features/books/pages/BooksPage';
 import { BookDetailPage } from '@/features/books/pages/BookDetailPage';
 import { CategoriesPage } from '@/features/categories/pages/CategoriesPage';
+import { CollectionsPage } from '@/features/collections/pages/CollectionsPage';
 import { TransactionsPage } from '@/features/transactions/pages/TransactionsPage';
 
 export function AppRoutes() {
@@ -37,6 +38,7 @@ export function AppRoutes() {
           <Route path="/books" element={<BooksPage />} />
           <Route path="/books/:id" element={<BookDetailPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/collections" element={<CollectionsPage />} />
           <Route path="/transactions" element={<TransactionsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

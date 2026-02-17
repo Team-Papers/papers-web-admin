@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, Users, PenTool, BookOpen, FolderTree, Receipt, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { LayoutDashboard, Users, PenTool, BookOpen, FolderTree, Library, Receipt, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useState } from 'react';
 
@@ -10,6 +10,7 @@ const links = [
   { to: '/authors', icon: PenTool, key: 'nav.authors' },
   { to: '/books', icon: BookOpen, key: 'nav.books' },
   { to: '/categories', icon: FolderTree, key: 'nav.categories' },
+  { to: '/collections', icon: Library, key: 'nav.collections' },
   { to: '/transactions', icon: Receipt, key: 'nav.transactions' },
 ];
 
