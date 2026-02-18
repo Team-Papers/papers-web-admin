@@ -7,7 +7,8 @@
     "books": "Livres",
     "categories": "Catégories",
     "collections": "Collections",
-    "transactions": "Transactions"
+    "transactions": "Transactions",
+    "reviews": "Avis"
   },
   "actions": {
     "save": "Enregistrer",
@@ -25,7 +26,9 @@
     "demote": "Rétrograder",
     "search": "Rechercher...",
     "close": "Fermer",
-    "createAdmin": "Créer un admin"
+    "createAdmin": "Créer un admin",
+    "hide": "Masquer",
+    "unhide": "Afficher"
   },
   "createAdminPage": {
     "title": "Créer un administrateur",
@@ -44,7 +47,10 @@
     "approved": "Approuvé",
     "rejected": "Rejeté",
     "draft": "Brouillon",
-    "published": "Publié"
+    "published": "Publié",
+    "visible": "Visible",
+    "hidden": "Masqué",
+    "reported": "Signalé"
   },
   "pagination": {
     "previous": "Précédent",

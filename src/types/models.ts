@@ -118,12 +118,21 @@ export interface Collection {
   updatedAt: string;
 }
 
+export enum ReviewStatus {
+  VISIBLE = 'VISIBLE',
+  HIDDEN = 'HIDDEN',
+  REPORTED = 'REPORTED',
+}
+
 export interface Review {
   id: string;
   rating: number;
   comment?: string;
+  status?: ReviewStatus;
   userId: string;
-  user?: { id: string; firstName: string; lastName: string; avatarUrl?: string };
+  user?: { id: string; email?: string; firstName: string; lastName: string; avatarUrl?: string };
+  bookId?: string;
+  book?: { id: string; title: string; coverUrl?: string };
   createdAt: string;
 }
 

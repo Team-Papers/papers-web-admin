@@ -14,6 +14,7 @@ import { BookDetailPage } from '@/features/books/pages/BookDetailPage';
 import { CategoriesPage } from '@/features/categories/pages/CategoriesPage';
 import { CollectionsPage } from '@/features/collections/pages/CollectionsPage';
 import { TransactionsPage } from '@/features/transactions/pages/TransactionsPage';
+import { ReviewsPage } from '@/features/reviews/pages/ReviewsPage';
 
 export function AppRoutes() {
   return (
@@ -39,6 +40,7 @@ export function AppRoutes() {
           <Route path="/books/:id" element={<BookDetailPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/collections" element={<CollectionsPage />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/transactions" element={<TransactionsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
