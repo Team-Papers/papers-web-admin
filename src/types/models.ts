@@ -147,6 +147,27 @@ export interface Transaction {
   createdAt: string;
 }
 
+export enum ArticleStatus {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  coverUrl?: string;
+  category?: string;
+  status: ArticleStatus;
+  publishedAt?: string;
+  likesCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export enum NotificationType {
   BOOK_APPROVED = 'BOOK_APPROVED',
   BOOK_REJECTED = 'BOOK_REJECTED',

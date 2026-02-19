@@ -8,6 +8,7 @@
     "categories": "Catégories",
     "collections": "Collections",
     "transactions": "Transactions",
+    "blog": "Blog",
     "reviews": "Avis"
   },
   "actions": {
@@ -48,6 +49,7 @@
     "rejected": "Rejeté",
     "draft": "Brouillon",
     "published": "Publié",
+    "archived": "Archivé",
     "visible": "Visible",
     "hidden": "Masqué",
     "reported": "Signalé"
