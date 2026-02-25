@@ -7,10 +7,14 @@ export interface TransactionsParams {
   page?: number;
   limit?: number;
   type?: string;
+  status?: string;
+  search?: string;
 }
 
 export async function getTransactions(params: TransactionsParams = {}): Promise<PaginatedResponse<Transaction>> {
-  const res = await apiClient.get<ApiPaginatedRaw<Transaction>>('/admin/transactions', { params });
+  const { search, ...rest } = params;
+  const query = { ...rest, ...(search ? { q: search } : {}) };
+  const res = await apiClient.get<ApiPaginatedRaw<Transaction>>('/admin/transactions', { params: query });
   return toPaginated(res.data);
 }
 

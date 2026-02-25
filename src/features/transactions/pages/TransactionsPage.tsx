@@ -5,6 +5,7 @@ import {
   TrendingUp, TrendingDown, FileText, Copy, Check,
 } from 'lucide-react';
 import { Header } from '@/components/organisms/Header';
+import { SearchBar } from '@/components/molecules/SearchBar';
 import { DataTable, type Column } from '@/components/organisms/DataTable';
 import { Badge } from '@/components/atoms/Badge';
 import { Modal } from '@/components/molecules/Modal';
@@ -202,7 +203,8 @@ export function TransactionsPage() {
     <>
       <Header title={t('nav.transactions')} />
       <div className="space-y-4 p-6">
-        <div className="flex gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="w-72"><SearchBar value={table.search} onChange={table.setSearch} placeholder="Rechercher par auteur, livre, email..." /></div>
           <select
             className="rounded-xl border border-outline-variant bg-surface px-3 py-2 text-sm text-on-surface focus:border-primary focus:outline-none"
             value={table.filters.type || ''}
@@ -211,6 +213,16 @@ export function TransactionsPage() {
             <option value="">Tous les types</option>
             <option value="SALE">Ventes</option>
             <option value="WITHDRAWAL">Retraits</option>
+          </select>
+          <select
+            className="rounded-xl border border-outline-variant bg-surface px-3 py-2 text-sm text-on-surface focus:border-primary focus:outline-none"
+            value={table.filters.status || ''}
+            onChange={(e) => table.setFilters({ ...table.filters, status: e.target.value })}
+          >
+            <option value="">Tous les statuts</option>
+            <option value="COMPLETED">Complété</option>
+            <option value="PENDING">En attente</option>
+            <option value="FAILED">Échoué</option>
           </select>
         </div>
         <DataTable

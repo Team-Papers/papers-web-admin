@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import {
   Users, PenTool, BookOpen, DollarSign, AlertCircle,
   TrendingUp, TrendingDown, ShoppingCart, Star,
@@ -20,6 +20,7 @@ const PIE_COLORS = ['#00B4D8', '#0077B6', '#023E8A', '#F77F00', '#FCBF49', '#EAE
 
 export function DashboardPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -143,15 +144,15 @@ export function DashboardPage() {
             </div>
             <div className="space-y-3">
               {topBooks.length > 0 ? topBooks.map((book, i) => (
-                <div key={book.id} className="flex items-center gap-3">
+                <div key={book.id} onClick={() => navigate(`/books/${book.id}`)} className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-container">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-container text-xs font-bold text-primary">
                     {i + 1}
                   </span>
                   {book.coverUrl ? (
                     <img src={book.coverUrl} alt="" className="h-10 w-7 shrink-0 rounded object-cover" />
                   ) : (
-                    <div className="flex h-10 w-7 shrink-0 items-center justify-center rounded bg-gray-100">
-                      <BookOpen size={12} className="text-gray-400" />
+                    <div className="flex h-10 w-7 shrink-0 items-center justify-center rounded bg-surface-container">
+                      <BookOpen size={12} className="text-on-surface-variant" />
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
@@ -177,14 +178,14 @@ export function DashboardPage() {
             </div>
             <div className="space-y-3">
               {topAuthors.length > 0 ? topAuthors.map((author, i) => (
-                <div key={author.id} className="flex items-center gap-3">
+                <div key={author.id} onClick={() => navigate(`/authors/${author.id}`)} className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-container">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success-container text-xs font-bold text-success">
                     {i + 1}
                   </span>
                   {author.photoUrl ? (
                     <img src={author.photoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />
                   ) : (
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-500">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-container text-xs font-bold text-on-surface-variant">
                       {author.penName.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -253,7 +254,8 @@ export function DashboardPage() {
               {recentTransactions.map((tx, index) => (
                 <div
                   key={tx.id}
-                  className="flex items-center justify-between rounded-lg px-3 py-3 transition-colors hover:bg-surface-container animate-fade-up"
+                  onClick={() => navigate('/transactions')}
+                  className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-3 transition-colors hover:bg-surface-container animate-fade-up"
                   style={{ animationDelay: `${300 + index * 40}ms` }}
                 >
                   <div className="flex items-center gap-3">

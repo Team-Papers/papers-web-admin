@@ -35,8 +35,27 @@ export function AuthorsPage() {
   };
 
   const columns: Column<AuthorProfile>[] = [
-    { key: 'user', header: 'Auteur', render: (a) => a.user ? `${a.user.firstName} ${a.user.lastName}` : a.userId },
-    { key: 'bio', header: 'Bio', render: (a) => <span className="max-w-xs truncate block">{a.bio}</span> },
+    {
+      key: 'user', header: 'Auteur', render: (a) => {
+        const name = a.user ? `${a.user.firstName} ${a.user.lastName}` : a.userId;
+        return (
+          <div className="flex items-center gap-2">
+            {a.photoUrl ? (
+              <img src={a.photoUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-container text-xs font-bold text-primary">
+                {(a.penName || name).charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">{a.penName || name}</p>
+              {a.user?.email && <p className="truncate text-xs text-on-surface-variant">{a.user.email}</p>}
+            </div>
+          </div>
+        );
+      },
+    },
+    { key: 'bio', header: 'Bio', render: (a) => <span className="max-w-xs truncate block text-on-surface-variant">{a.bio || '—'}</span> },
     { key: 'status', header: 'Statut', render: (a) => <Badge variant={statusVariant[a.status]}>{t(`status.${a.status.toLowerCase()}`)}</Badge> },
     { key: 'createdAt', header: 'Date', render: (a) => formatDate(a.createdAt) },
     {
@@ -58,25 +77,37 @@ export function AuthorsPage() {
     <>
       <Header title={t('nav.authors')} />
       <div className="p-6 space-y-4">
-        <div className="flex gap-4 border-b border-gray-200">
+        <div className="flex gap-4 border-b border-outline-variant">
           {(['PENDING', 'ALL'] as Tab[]).map((t2) => (
             <button
               key={t2}
               onClick={() => setTab(t2)}
-              className={`pb-2 text-sm font-medium transition-colors ${tab === t2 ? 'border-b-2 border-primary-400 text-primary-400' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`pb-2 text-sm font-medium transition-colors ${tab === t2 ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
             >
               {t2 === 'PENDING' ? 'En attente' : 'Tous'}
             </button>
           ))}
         </div>
-        <div className="w-72"><SearchBar value={table.search} onChange={table.setSearch} /></div>
-        <div className="rounded-lg border border-gray-200 bg-white">
-          <DataTable
-            columns={columns} data={table.data} isLoading={table.isLoading}
-            page={table.page} totalPages={table.totalPages} total={table.total} limit={table.limit}
-            onPageChange={table.setPage} onRowClick={(a) => navigate(`/authors/${a.id}`)} keyExtractor={(a) => a.id}
-          />
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="w-72"><SearchBar value={table.search} onChange={table.setSearch} /></div>
+          {tab === 'ALL' && (
+            <select
+              className="rounded-xl border border-outline-variant bg-surface px-3 py-2 text-sm text-on-surface focus:border-primary focus:outline-none"
+              value={table.filters.status || ''}
+              onChange={(e) => table.setFilters({ ...table.filters, status: e.target.value })}
+            >
+              <option value="">Tous les statuts</option>
+              <option value="PENDING">En attente</option>
+              <option value="APPROVED">Approuvé</option>
+              <option value="REJECTED">Rejeté</option>
+            </select>
+          )}
         </div>
+        <DataTable
+          columns={columns} data={table.data} isLoading={table.isLoading}
+          page={table.page} totalPages={table.totalPages} total={table.total} limit={table.limit}
+          onPageChange={table.setPage} onRowClick={(a) => navigate(`/authors/${a.id}`)} keyExtractor={(a) => a.id}
+        />
       </div>
       <RejectAuthorModal authorId={rejectId} onClose={() => setRejectId(null)} onSuccess={() => { setRejectId(null); table.refetch(); }} />
     </>
