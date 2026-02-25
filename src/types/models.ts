@@ -62,6 +62,36 @@ export interface AuthorProfile {
   updatedAt: string;
 }
 
+export interface AuthorBook {
+  id: string;
+  title: string;
+  coverUrl?: string;
+  price: number;
+  status: BookStatus;
+  publishedAt?: string;
+  createdAt: string;
+  _count?: { purchases: number; reviews: number };
+}
+
+export interface AuthorTransaction {
+  id: string;
+  type: string;
+  amount: number;
+  status: string;
+  reference?: string;
+  createdAt: string;
+  book?: { id: string; title: string } | null;
+}
+
+export interface AuthorDetail extends AuthorProfile {
+  books?: AuthorBook[];
+  transactions?: AuthorTransaction[];
+  totalRevenue: number;
+  totalSales: number;
+  totalWithdrawals: number;
+  _count?: { books: number; followers: number };
+}
+
 export interface Category {
   id: string;
   name: string;

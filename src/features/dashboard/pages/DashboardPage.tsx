@@ -13,10 +13,25 @@ import { Header } from '@/components/organisms/Header';
 import { StatCard } from '@/components/molecules/StatCard';
 import { Alert } from '@/components/molecules/Alert';
 import { Spinner } from '@/components/atoms/Spinner';
-import { getStats, type DashboardStats } from '@/lib/api/dashboard';
+import { getStats, getUsersChart, type DashboardStats } from '@/lib/api/dashboard';
 import { formatCurrency, formatDateTime } from '@/lib/utils/formatters';
 
 const PIE_COLORS = ['#00B4D8', '#0077B6', '#023E8A', '#F77F00', '#FCBF49', '#EAE2B7', '#D62828', '#8338EC', '#FF006E', '#3A86FF'];
+
+const USERS_PERIODS = [
+  { value: '7d', label: '7 jours' },
+  { value: '30d', label: '30 jours' },
+  { value: '3m', label: '3 mois' },
+  { value: '6m', label: '6 mois' },
+  { value: '1y', label: '1 an' },
+] as const;
+
+function formatChartDate(isoDate: string, dateFormat: string): string {
+  const d = new Date(isoDate);
+  if (dateFormat === 'month') return d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+  if (dateFormat === 'week') return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+}
 
 export function DashboardPage() {
   const { t } = useTranslation();
@@ -24,9 +39,26 @@ export function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Dynamic users chart
+  const [usersPeriod, setUsersPeriod] = useState('7d');
+  const [usersChartData, setUsersChartData] = useState<{ date: string; count: number }[]>([]);
+  const [usersDateFormat, setUsersDateFormat] = useState('day');
+  const [usersChartLoading, setUsersChartLoading] = useState(false);
+
   useEffect(() => {
     getStats().then(setStats).catch(() => {}).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    setUsersChartLoading(true);
+    getUsersChart(usersPeriod)
+      .then((res) => {
+        setUsersChartData(res.data);
+        setUsersDateFormat(res.dateFormat);
+      })
+      .catch(() => {})
+      .finally(() => setUsersChartLoading(false));
+  }, [usersPeriod]);
 
   if (loading) {
     return (
@@ -39,7 +71,6 @@ export function DashboardPage() {
   if (!stats) return null;
 
   const salesChart = stats.salesChart ?? [];
-  const newUsersChart = stats.newUsersChart ?? [];
   const topBooks = stats.topBooks ?? [];
   const topAuthors = stats.topAuthors ?? [];
   const categoryDistribution = stats.categoryDistribution ?? [];
@@ -114,22 +145,40 @@ export function DashboardPage() {
 
           {/* New Users Chart - 1/3 width */}
           <div className="rounded-2xl border border-outline-variant bg-surface p-6 shadow-sm animate-fade-up" style={{ animationDelay: '50ms' }}>
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between">
               <h2 className="text-base font-semibold text-on-surface">Nouveaux inscrits</h2>
-              <span className="rounded-full bg-surface-container px-2.5 py-1 text-xs text-on-surface-variant">7 jours</span>
             </div>
-            {newUsersChart.length > 0 ? (
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={newUsersChart}>
+            <div className="mb-4 flex flex-wrap gap-1">
+              {USERS_PERIODS.map((p) => (
+                <button
+                  key={p.value}
+                  onClick={() => setUsersPeriod(p.value)}
+                  className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+                    usersPeriod === p.value
+                      ? 'bg-primary text-on-primary'
+                      : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            {usersChartLoading ? (
+              <div className="flex h-[260px] items-center justify-center">
+                <Spinner size="md" />
+              </div>
+            ) : usersChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={usersChartData.map((d) => ({ ...d, date: formatChartDate(d.date, usersDateFormat) }))}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" vertical={false} />
-                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-on-surface-variant)' }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--color-on-surface-variant)' }} axisLine={false} tickLine={false} interval={usersChartData.length > 30 ? Math.floor(usersChartData.length / 10) : 0} />
                   <YAxis tick={{ fontSize: 11, fill: 'var(--color-on-surface-variant)' }} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip contentStyle={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-outline)', borderRadius: '12px' }} />
                   <Bar dataKey="count" fill="#8338EC" radius={[6, 6, 0, 0]} name="Inscrits" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex h-[280px] items-center justify-center text-sm text-on-surface-variant">Aucune inscription récente</div>
+              <div className="flex h-[260px] items-center justify-center text-sm text-on-surface-variant">Aucune inscription sur cette période</div>
             )}
           </div>
         </div>

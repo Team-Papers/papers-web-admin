@@ -23,7 +23,7 @@ type Tab = 'PENDING' | 'ALL';
 export function BooksPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>('PENDING');
+  const [tab, setTab] = useState<Tab>('ALL');
   const [rejectId, setRejectId] = useState<string | null>(null);
 
   const fetchFn = useCallback(

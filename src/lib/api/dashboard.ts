@@ -48,3 +48,14 @@ export async function getStats(): Promise<DashboardStats> {
   const res = await apiClient.get<{ success: boolean; data: DashboardStats }>('/admin/dashboard');
   return res.data.data;
 }
+
+export interface UsersChartResponse {
+  period: string;
+  dateFormat: string;
+  data: { date: string; count: number }[];
+}
+
+export async function getUsersChart(period: string): Promise<UsersChartResponse> {
+  const res = await apiClient.get<{ success: boolean; data: UsersChartResponse }>('/admin/dashboard/users-chart', { params: { period } });
+  return res.data.data;
+}

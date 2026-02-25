@@ -1,6 +1,6 @@
 import type { ApiResponse, ApiPaginatedRaw, PaginatedResponse } from '@/types/api';
 import { toPaginated } from '@/types/api';
-import type { AuthorProfile } from '@/types/models';
+import type { AuthorProfile, AuthorDetail } from '@/types/models';
 import apiClient from './client';
 
 export interface AuthorsParams {
@@ -13,6 +13,11 @@ export interface AuthorsParams {
 export async function getAuthors(params: AuthorsParams = {}): Promise<PaginatedResponse<AuthorProfile>> {
   const res = await apiClient.get<ApiPaginatedRaw<AuthorProfile>>('/admin/authors', { params });
   return toPaginated(res.data);
+}
+
+export async function getAuthorById(id: string): Promise<AuthorDetail> {
+  const res = await apiClient.get<ApiResponse<AuthorDetail>>(`/admin/authors/${id}`);
+  return res.data.data;
 }
 
 export async function approveAuthor(id: string): Promise<AuthorProfile> {
