@@ -37,18 +37,25 @@ export function DashboardPage() {
 
   if (!stats) return null;
 
+  const salesChart = stats.salesChart ?? [];
+  const newUsersChart = stats.newUsersChart ?? [];
+  const topBooks = stats.topBooks ?? [];
+  const topAuthors = stats.topAuthors ?? [];
+  const categoryDistribution = stats.categoryDistribution ?? [];
+  const recentTransactions = stats.recentTransactions ?? [];
+
   return (
     <>
       <Header title={t('nav.dashboard')} />
       <div className="space-y-6 p-6">
         {/* Row 1: Stat Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          <StatCard title="Utilisateurs" value={stats.totalUsers} icon={<Users size={20} />} index={0} />
-          <StatCard title="Auteurs" value={stats.totalAuthors} icon={<PenTool size={20} />} iconBg="bg-success-container text-success" index={1} />
-          <StatCard title="Livres" value={stats.totalBooks} icon={<BookOpen size={20} />} iconBg="bg-warning-container text-warning" index={2} />
-          <StatCard title="Ventes" value={stats.totalPurchases} icon={<ShoppingCart size={20} />} iconBg="bg-accent-100 text-accent-600" index={3} />
-          <StatCard title="Note moyenne" value={`${stats.avgRating}/5`} icon={<Star size={20} />} iconBg="bg-warning-container text-warning" index={4} />
-          <StatCard title="Revenus" value={formatCurrency(stats.totalRevenue)} icon={<DollarSign size={20} />} iconBg="bg-success-container text-success" index={5} />
+          <StatCard title="Utilisateurs" value={stats.totalUsers ?? 0} icon={<Users size={20} />} index={0} />
+          <StatCard title="Auteurs" value={stats.totalAuthors ?? 0} icon={<PenTool size={20} />} iconBg="bg-success-container text-success" index={1} />
+          <StatCard title="Livres" value={stats.totalBooks ?? 0} icon={<BookOpen size={20} />} iconBg="bg-warning-container text-warning" index={2} />
+          <StatCard title="Ventes" value={stats.totalPurchases ?? 0} icon={<ShoppingCart size={20} />} iconBg="bg-accent-100 text-accent-600" index={3} />
+          <StatCard title="Note moyenne" value={`${stats.avgRating ?? 0}/5`} icon={<Star size={20} />} iconBg="bg-warning-container text-warning" index={4} />
+          <StatCard title="Revenus" value={formatCurrency(stats.totalRevenue ?? 0)} icon={<DollarSign size={20} />} iconBg="bg-success-container text-success" index={5} />
         </div>
 
         {/* Alerts */}
@@ -80,12 +87,12 @@ export function DashboardPage() {
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-base font-semibold text-on-surface">Ventes (30 derniers jours)</h2>
               <span className="rounded-full bg-surface-container px-2.5 py-1 text-xs text-on-surface-variant">
-                {stats.salesChart.length} jours
+                {salesChart.length} jours
               </span>
             </div>
-            {stats.salesChart.length > 0 ? (
+            {salesChart.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={stats.salesChart}>
+                <AreaChart data={salesChart}>
                   <defs>
                     <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#00B4D8" stopOpacity={0.3} />
@@ -110,9 +117,9 @@ export function DashboardPage() {
               <h2 className="text-base font-semibold text-on-surface">Nouveaux inscrits</h2>
               <span className="rounded-full bg-surface-container px-2.5 py-1 text-xs text-on-surface-variant">7 jours</span>
             </div>
-            {stats.newUsersChart.length > 0 ? (
+            {newUsersChart.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={stats.newUsersChart}>
+                <BarChart data={newUsersChart}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" vertical={false} />
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-on-surface-variant)' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: 'var(--color-on-surface-variant)' }} axisLine={false} tickLine={false} allowDecimals={false} />
@@ -135,7 +142,7 @@ export function DashboardPage() {
               <BookOpen className="h-4 w-4 text-on-surface-variant" />
             </div>
             <div className="space-y-3">
-              {stats.topBooks.length > 0 ? stats.topBooks.map((book, i) => (
+              {topBooks.length > 0 ? topBooks.map((book, i) => (
                 <div key={book.id} className="flex items-center gap-3">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-container text-xs font-bold text-primary">
                     {i + 1}
@@ -169,7 +176,7 @@ export function DashboardPage() {
               <PenTool className="h-4 w-4 text-on-surface-variant" />
             </div>
             <div className="space-y-3">
-              {stats.topAuthors.length > 0 ? stats.topAuthors.map((author, i) => (
+              {topAuthors.length > 0 ? topAuthors.map((author, i) => (
                 <div key={author.id} className="flex items-center gap-3">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success-container text-xs font-bold text-success">
                     {i + 1}
@@ -198,12 +205,12 @@ export function DashboardPage() {
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-base font-semibold text-on-surface">Livres par catégorie</h2>
             </div>
-            {stats.categoryDistribution.length > 0 ? (
+            {categoryDistribution.length > 0 ? (
               <>
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
                     <Pie
-                      data={stats.categoryDistribution}
+                      data={categoryDistribution}
                       cx="50%"
                       cy="50%"
                       innerRadius={50}
@@ -212,7 +219,7 @@ export function DashboardPage() {
                       dataKey="count"
                       nameKey="name"
                     >
-                      {stats.categoryDistribution.map((_, i) => (
+                      {categoryDistribution.map((_, i) => (
                         <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                       ))}
                     </Pie>
@@ -220,7 +227,7 @@ export function DashboardPage() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
-                  {stats.categoryDistribution.slice(0, 6).map((cat, i) => (
+                  {categoryDistribution.slice(0, 6).map((cat, i) => (
                     <div key={cat.name} className="flex items-center gap-2 text-xs">
                       <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
                       <span className="truncate text-on-surface-variant">{cat.name}</span>
@@ -241,9 +248,9 @@ export function DashboardPage() {
             <h2 className="text-base font-semibold text-on-surface">Activité récente</h2>
             <Link to="/transactions" className="text-xs font-medium text-primary hover:underline">Voir tout</Link>
           </div>
-          {stats.recentTransactions.length > 0 ? (
+          {recentTransactions.length > 0 ? (
             <div className="space-y-1">
-              {stats.recentTransactions.map((tx, index) => (
+              {recentTransactions.map((tx, index) => (
                 <div
                   key={tx.id}
                   className="flex items-center justify-between rounded-lg px-3 py-3 transition-colors hover:bg-surface-container animate-fade-up"
