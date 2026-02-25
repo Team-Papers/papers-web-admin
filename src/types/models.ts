@@ -136,14 +136,39 @@ export interface Review {
   createdAt: string;
 }
 
+export interface TransactionAuthor {
+  id: string;
+  penName: string | null;
+  photoUrl?: string | null;
+  user: { id: string; firstName: string; lastName: string; email: string; avatarUrl?: string | null; role?: string; createdAt?: string };
+}
+
+export interface TransactionPurchase {
+  id: string;
+  amount: number;
+  paymentMethod: string | null;
+  paymentRef: string | null;
+  status: string;
+  createdAt: string;
+  user: { id: string; firstName: string; lastName: string; email: string; avatarUrl?: string | null; role?: string; createdAt?: string };
+}
+
 export interface Transaction {
   id: string;
   type: TransactionType;
   amount: number;
-  userId: string;
-  user?: User;
+  commission?: number;
+  netAmount?: number;
+  reference?: string;
+  status?: string;
+  authorId?: string;
+  author?: TransactionAuthor;
   bookId?: string;
-  book?: Book;
+  book?: { id: string; title: string; coverUrl?: string | null; price?: number; slug?: string };
+  purchaseId?: string;
+  purchase?: TransactionPurchase | null;
+  userId?: string;
+  user?: User;
   createdAt: string;
 }
 

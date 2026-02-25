@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Upload } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { Modal } from '@/components/molecules/Modal';
 import { FormField } from '@/components/molecules/FormField';
 import { Button } from '@/components/atoms/Button';
 import { createArticle, updateArticle } from '@/lib/api/blog';
 import { uploadCoverImage } from '@/lib/api/collections';
-import type { Article } from '@/types/models';
+import { getCategories } from '@/lib/api/categories';
+import type { Article, Category } from '@/types/models';
 import { ArticleStatus } from '@/types/models';
 
 interface Props {
@@ -22,11 +23,20 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
   const [content, setContent] = useState('');
   const [excerpt, setExcerpt] = useState('');
   const [coverUrl, setCoverUrl] = useState('');
-  const [category, setCategory] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [status, setStatus] = useState<string>(ArticleStatus.DRAFT);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      getCategories()
+        .then(setCategories)
+        .catch((err) => console.error('Failed to load categories:', err));
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (article) {
@@ -34,17 +44,25 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
       setContent(article.content);
       setExcerpt(article.excerpt || '');
       setCoverUrl(article.coverUrl || '');
-      setCategory(article.category || '');
+      setSelectedCategories(
+        article.category ? article.category.split(',').map((c) => c.trim()).filter(Boolean) : []
+      );
       setStatus(article.status);
     } else {
       setTitle('');
       setContent('');
       setExcerpt('');
       setCoverUrl('');
-      setCategory('');
+      setSelectedCategories([]);
       setStatus(ArticleStatus.DRAFT);
     }
   }, [article, isOpen]);
+
+  const toggleCategory = (name: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]
+    );
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -68,7 +86,7 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
         content,
         excerpt: excerpt || undefined,
         coverUrl: coverUrl || undefined,
-        category: category || undefined,
+        category: selectedCategories.length > 0 ? selectedCategories.join(', ') : undefined,
         status,
       };
       if (article) {
@@ -86,12 +104,18 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={article ? 'Modifier l\'article' : 'Créer un article'}
+      title={article ? "Modifier l'article" : 'Créer un article'}
       size="xl"
       footer={
         <>
-          <Button variant="secondary" onClick={onClose}>{t('actions.cancel')}</Button>
-          <Button isLoading={loading} onClick={handleSubmit} disabled={!title.trim() || !content.trim()}>
+          <Button variant="secondary" onClick={onClose}>
+            {t('actions.cancel')}
+          </Button>
+          <Button
+            isLoading={loading}
+            onClick={handleSubmit}
+            disabled={!title.trim() || !content.trim()}
+          >
             {t('actions.save')}
           </Button>
         </>
@@ -106,12 +130,50 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
           maxLength={255}
         />
 
-        <FormField
-          label="Catégorie"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="Ex: Technologie, Culture, ..."
-        />
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Catégories</label>
+          {selectedCategories.length > 0 && (
+            <div className="mb-2 flex flex-wrap gap-2">
+              {selectedCategories.map((name) => (
+                <span
+                  key={name}
+                  className="inline-flex items-center gap-1 rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-primary-700"
+                >
+                  {name}
+                  <button
+                    type="button"
+                    onClick={() => toggleCategory(name)}
+                    className="text-primary-500 hover:text-primary-800"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex max-h-32 flex-wrap gap-2 overflow-y-auto rounded-md border border-gray-300 p-3">
+            {categories.map((cat) => {
+              const isSelected = selectedCategories.includes(cat.name);
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => toggleCategory(cat.name)}
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                    isSelected
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              );
+            })}
+            {categories.length === 0 && (
+              <span className="text-xs text-gray-400">Chargement des catégories...</span>
+            )}
+          </div>
+        </div>
 
         <FormField
           label="Extrait"
@@ -146,7 +208,7 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
             isLoading={uploading}
             onClick={() => fileRef.current?.click()}
           >
-            {coverUrl ? 'Changer l\'image' : 'Uploader une image'}
+            {coverUrl ? "Changer l'image" : 'Uploader une image'}
           </Button>
         </div>
 
