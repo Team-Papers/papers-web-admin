@@ -113,9 +113,9 @@ export function DashboardPage() {
         )}
 
         {/* Row 2: Sales Chart + New Users Chart */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Sales Chart - 2/3 width */}
-          <div className="lg:col-span-2 rounded-2xl border border-outline-variant bg-surface p-6 shadow-sm animate-fade-up">
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Sales Chart */}
+          <div className="rounded-2xl border border-outline-variant bg-surface p-6 shadow-sm animate-fade-up">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-base font-semibold text-on-surface">Ventes (30 derniers jours)</h2>
               <span className="rounded-full bg-surface-container px-2.5 py-1 text-xs text-on-surface-variant">

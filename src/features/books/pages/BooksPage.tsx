@@ -58,7 +58,7 @@ export function BooksPage() {
     },
     { key: 'price', header: 'Prix', render: (b) => formatCurrency(b.price) },
     { key: 'status', header: 'Statut', render: (b) => <Badge variant={statusVariant[b.status]}>{t(`status.${b.status.toLowerCase()}`)}</Badge> },
-    { key: 'totalSales', header: 'Ventes' },
+    { key: 'totalSales', header: 'Ventes', render: (b) => <span className="font-medium">{b._count?.purchases ?? 0}</span> },
     {
       key: 'actions', header: 'Actions', render: (b) =>
         b.status === BookStatus.PENDING ? (

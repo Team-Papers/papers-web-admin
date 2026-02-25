@@ -11,7 +11,9 @@ export interface AuthorsParams {
 }
 
 export async function getAuthors(params: AuthorsParams = {}): Promise<PaginatedResponse<AuthorProfile>> {
-  const res = await apiClient.get<ApiPaginatedRaw<AuthorProfile>>('/admin/authors', { params });
+  const { search, ...rest } = params;
+  const query = { ...rest, ...(search ? { q: search } : {}) };
+  const res = await apiClient.get<ApiPaginatedRaw<AuthorProfile>>('/admin/authors', { params: query });
   return toPaginated(res.data);
 }
 
