@@ -81,7 +81,7 @@ export function DashboardPage() {
       <Header title={t('nav.dashboard')} />
       <div className="space-y-6 p-6">
         {/* Row 1: Stat Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard title="Utilisateurs" value={stats.totalUsers ?? 0} icon={<Users size={20} />} index={0} />
           <StatCard title="Auteurs" value={stats.totalAuthors ?? 0} icon={<PenTool size={20} />} iconBg="bg-success-container text-success" index={1} />
           <StatCard title="Livres" value={stats.totalBooks ?? 0} icon={<BookOpen size={20} />} iconBg="bg-warning-container text-warning" index={2} />
