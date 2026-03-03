@@ -73,8 +73,8 @@ export function CategoryModal({ isOpen, category, categories, onClose, onSuccess
         <FormField label="Slug" value={slug} onChange={(e) => setSlug(e.target.value)} required />
         <FormField label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Catégorie parente</label>
-          <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" value={parentId} onChange={(e) => setParentId(e.target.value)}>
+          <label className="mb-1 block text-sm font-medium text-on-surface-variant">Catégorie parente</label>
+          <select className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm" value={parentId} onChange={(e) => setParentId(e.target.value)}>
             <option value="">Aucune (racine)</option>
             {roots.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>

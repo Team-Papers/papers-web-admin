@@ -28,32 +28,32 @@ export function CreateAdminPage() {
     }
   };
 
-  const inputClass = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500';
+  const inputClass = 'w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary';
 
   return (
     <>
       <Header title={t('createAdminPage.title')} />
       <div className="p-6">
-        <form onSubmit={handleSubmit} className="mx-auto max-w-lg space-y-4 rounded-lg border border-gray-200 bg-white p-6">
+        <form onSubmit={handleSubmit} className="mx-auto max-w-lg space-y-4 rounded-lg border border-outline-variant bg-surface p-6">
           {error && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>
+            <div className="rounded-md bg-error-container p-3 text-sm text-error">{error}</div>
           )}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">{t('createAdminPage.firstName')}</label>
+            <label className="mb-1 block text-sm font-medium text-on-surface-variant">{t('createAdminPage.firstName')}</label>
             <input className={inputClass} value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">{t('createAdminPage.lastName')}</label>
+            <label className="mb-1 block text-sm font-medium text-on-surface-variant">{t('createAdminPage.lastName')}</label>
             <input className={inputClass} value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">{t('createAdminPage.email')}</label>
+            <label className="mb-1 block text-sm font-medium text-on-surface-variant">{t('createAdminPage.email')}</label>
             <input type="email" className={inputClass} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">{t('createAdminPage.password')}</label>
+            <label className="mb-1 block text-sm font-medium text-on-surface-variant">{t('createAdminPage.password')}</label>
             <input type="password" className={inputClass} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} minLength={8} required />
-            <p className="mt-1 text-xs text-gray-500">{t('createAdminPage.passwordHint')}</p>
+            <p className="mt-1 text-xs text-on-surface-muted">{t('createAdminPage.passwordHint')}</p>
           </div>
           <div className="flex gap-3 pt-2">
             <Button type="submit" disabled={!isValid || loading}>

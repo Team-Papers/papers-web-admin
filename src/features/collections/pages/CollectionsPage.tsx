@@ -63,47 +63,47 @@ export function CollectionsPage() {
           </Button>
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white">
+        <div className="rounded-lg border border-outline-variant bg-surface">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-4 py-3 text-left font-medium text-gray-600">Image</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-600">Nom</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-600">Livres</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-600">Statut</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-600">Ordre</th>
-                <th className="px-4 py-3 text-right font-medium text-gray-600">Actions</th>
+              <tr className="border-b border-outline-variant bg-surface-container">
+                <th className="px-4 py-3 text-left font-medium text-on-surface-variant">Image</th>
+                <th className="px-4 py-3 text-left font-medium text-on-surface-variant">Nom</th>
+                <th className="px-4 py-3 text-left font-medium text-on-surface-variant">Livres</th>
+                <th className="px-4 py-3 text-left font-medium text-on-surface-variant">Statut</th>
+                <th className="px-4 py-3 text-left font-medium text-on-surface-variant">Ordre</th>
+                <th className="px-4 py-3 text-right font-medium text-on-surface-variant">Actions</th>
               </tr>
             </thead>
             <tbody>
               {collections.map((col) => (
-                <tr key={col.id} className="border-b border-gray-100 hover:bg-gray-50">
+                <tr key={col.id} className="border-b border-outline-variant hover:bg-surface-container">
                   <td className="px-4 py-3">
                     {col.imageUrl ? (
                       <img src={col.imageUrl} alt={col.name} className="h-12 w-20 rounded-lg object-cover" />
                     ) : (
-                      <div className="flex h-12 w-20 items-center justify-center rounded-lg bg-gray-100 text-gray-400">
+                      <div className="flex h-12 w-20 items-center justify-center rounded-lg bg-surface-container text-on-surface-muted">
                         <BookOpen size={20} />
                       </div>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <div>
-                      <p className="font-medium text-gray-900">{col.name}</p>
-                      {col.description && <p className="text-xs text-gray-500">{col.description}</p>}
+                      <p className="font-medium text-on-surface">{col.name}</p>
+                      {col.description && <p className="text-xs text-on-surface-muted">{col.description}</p>}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{col._count?.books ?? 0}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{col._count?.books ?? 0}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                       col.isActive
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-500'
+                        ? 'bg-success-container text-success-dark'
+                        : 'bg-surface-container text-on-surface-muted'
                     }`}>
                       {col.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{col.orderIndex}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{col.orderIndex}</td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
                       <Button size="sm" variant="ghost" onClick={() => setBooksCollection(col)} title="Gérer les livres">
@@ -124,7 +124,7 @@ export function CollectionsPage() {
               ))}
               {collections.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-sm text-gray-500">
+                  <td colSpan={6} className="py-12 text-center text-sm text-on-surface-muted">
                     {t('table.noData')}
                   </td>
                 </tr>
@@ -168,7 +168,7 @@ export function CollectionsPage() {
           </>
         }
       >
-        <p className="text-sm text-gray-600">Cette action est irréversible. Les livres ne seront pas supprimés.</p>
+        <p className="text-sm text-on-surface-variant">Cette action est irréversible. Les livres ne seront pas supprimés.</p>
       </Modal>
     </>
   );

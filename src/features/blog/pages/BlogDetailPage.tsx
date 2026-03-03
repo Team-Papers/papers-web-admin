@@ -64,7 +64,7 @@ export function BlogDetailPage() {
       <>
         <Header title="Article" />
         <div className="flex h-64 flex-col items-center justify-center gap-2">
-          <p className="text-gray-500">Article non trouvé</p>
+          <p className="text-on-surface-muted">Article non trouvé</p>
           <Button variant="secondary" onClick={() => navigate('/blog')}>Retour</Button>
         </div>
       </>
@@ -106,7 +106,7 @@ export function BlogDetailPage() {
                   {article.category}
                 </span>
               )}
-              <span className="flex items-center gap-1 text-sm text-gray-500">
+              <span className="flex items-center gap-1 text-sm text-on-surface-muted">
                 <Heart size={14} />
                 {article.likesCount} likes
               </span>
@@ -158,7 +158,7 @@ export function BlogDetailPage() {
           </>
         }
       >
-        <p className="text-sm text-gray-600">Cette action est irréversible. L'article sera définitivement supprimé.</p>
+        <p className="text-sm text-on-surface-variant">Cette action est irréversible. L'article sera définitivement supprimé.</p>
       </Modal>
     </>
   );

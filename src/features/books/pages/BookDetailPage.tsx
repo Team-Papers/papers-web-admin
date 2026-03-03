@@ -65,7 +65,7 @@ export function BookDetailPage() {
   if (!book) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-gray-500">Livre introuvable</p>
+        <p className="text-on-surface-muted">Livre introuvable</p>
       </div>
     );
   }
@@ -130,7 +130,7 @@ export function BookDetailPage() {
       <Header title="Détails du livre" />
       <div className="p-6 space-y-6">
         {/* Book Info Card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
+        <div className="rounded-lg border border-outline-variant bg-surface p-6">
           <div className="flex gap-6">
             {/* Cover */}
             <div className="flex-shrink-0">
@@ -142,8 +142,8 @@ export function BookDetailPage() {
                   onClick={() => window.open(coverUrl, '_blank')}
                 />
               ) : (
-                <div className="h-64 w-48 rounded-lg bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-400 text-sm">Pas de couverture</span>
+                <div className="h-64 w-48 rounded-lg bg-surface-container flex items-center justify-center">
+                  <span className="text-on-surface-muted text-sm">Pas de couverture</span>
                 </div>
               )}
             </div>
@@ -152,35 +152,35 @@ export function BookDetailPage() {
             <div className="flex-1 space-y-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{book.title}</h2>
-                  {book.slug && <p className="text-sm text-gray-500">/{book.slug}</p>}
+                  <h2 className="text-2xl font-bold text-on-surface">{book.title}</h2>
+                  {book.slug && <p className="text-sm text-on-surface-muted">/{book.slug}</p>}
                 </div>
                 <Badge variant={statusVariant[book.status]}>{statusLabels[book.status]}</Badge>
               </div>
 
               {book.status === BookStatus.REJECTED && book.rejectionReason && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-sm font-medium text-red-800">Motif du rejet :</p>
-                  <p className="text-sm text-red-700">{book.rejectionReason}</p>
+                <div className="bg-error-container border border-error rounded-lg p-3">
+                  <p className="text-sm font-medium text-error-dark">Motif du rejet :</p>
+                  <p className="text-sm text-error-dark">{book.rejectionReason}</p>
                 </div>
               )}
 
               {/* Rejection History */}
               {book.rejectionHistory && book.rejectionHistory.length > 0 && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                  <p className="text-sm font-medium text-amber-800 mb-2">Historique des rejets ({book.rejectionHistory.length})</p>
+                <div className="bg-warning-container border border-warning rounded-lg p-3">
+                  <p className="text-sm font-medium text-warning-dark mb-2">Historique des rejets ({book.rejectionHistory.length})</p>
                   <div className="space-y-2">
                     {book.rejectionHistory.map((rejection, index) => (
-                      <div key={index} className="text-sm border-l-2 border-amber-300 pl-3">
-                        <p className="text-amber-700">{rejection.reason}</p>
-                        <p className="text-xs text-amber-600">{formatDate(rejection.date)}</p>
+                      <div key={index} className="text-sm border-l-2 border-warning pl-3">
+                        <p className="text-warning-dark">{rejection.reason}</p>
+                        <p className="text-xs text-warning-dark">{formatDate(rejection.date)}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              <p className="text-gray-600 whitespace-pre-line">{book.description || 'Pas de description'}</p>
+              <p className="text-on-surface-variant whitespace-pre-line">{book.description || 'Pas de description'}</p>
 
               {/* Categories */}
               {categories.length > 0 && (
@@ -188,7 +188,7 @@ export function BookDetailPage() {
                   {categories.map((cat) => (
                     <span
                       key={cat.id}
-                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                      className="px-2 py-1 bg-info-container text-info-dark text-xs rounded-full"
                     >
                       {cat.icon} {cat.name}
                     </span>
@@ -197,37 +197,37 @@ export function BookDetailPage() {
               )}
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-outline-variant">
                 <div>
-                  <p className="text-sm text-gray-500">Prix</p>
+                  <p className="text-sm text-on-surface-muted">Prix</p>
                   <p className="font-semibold text-lg">{formatCurrency(book.price)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Ventes</p>
+                  <p className="text-sm text-on-surface-muted">Ventes</p>
                   <p className="font-semibold text-lg">{book._count?.purchases ?? book.totalSales ?? 0}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Avis</p>
+                  <p className="text-sm text-on-surface-muted">Avis</p>
                   <p className="font-semibold text-lg">{book._count?.reviews ?? 0}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Format</p>
+                  <p className="text-sm text-on-surface-muted">Format</p>
                   <p className="font-semibold text-lg uppercase">{book.fileFormat || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Pages</p>
+                  <p className="text-sm text-on-surface-muted">Pages</p>
                   <p className="font-semibold">{book.pageCount || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Langue</p>
+                  <p className="text-sm text-on-surface-muted">Langue</p>
                   <p className="font-semibold uppercase">{book.language || 'FR'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">ISBN</p>
+                  <p className="text-sm text-on-surface-muted">ISBN</p>
                   <p className="font-semibold">{book.isbn || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Créé le</p>
+                  <p className="text-sm text-on-surface-muted">Créé le</p>
                   <p className="font-semibold">{formatDate(book.createdAt)}</p>
                 </div>
               </div>
@@ -261,7 +261,7 @@ export function BookDetailPage() {
 
         {/* Author Info Card */}
         {author && (
-          <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="rounded-lg border border-outline-variant bg-surface p-6">
             <h3 className="text-lg font-semibold mb-4">Informations sur l'auteur</h3>
             <div className="flex items-start gap-4">
               <Avatar
@@ -275,15 +275,15 @@ export function BookDetailPage() {
                     {author.penName || `${authorUser?.firstName} ${authorUser?.lastName}`}
                   </p>
                   {authorUser && (
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-on-surface-muted">
                       {authorUser.firstName} {authorUser.lastName} • {authorUser.email}
                     </p>
                   )}
                 </div>
-                {author.bio && <p className="text-gray-600 text-sm">{author.bio}</p>}
+                {author.bio && <p className="text-on-surface-variant text-sm">{author.bio}</p>}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
                   <div>
-                    <p className="text-xs text-gray-500">Statut</p>
+                    <p className="text-xs text-on-surface-muted">Statut</p>
                     <Badge
                       variant={
                         author.status === 'APPROVED' ? 'success' : author.status === 'PENDING' ? 'warning' : 'error'
@@ -294,19 +294,19 @@ export function BookDetailPage() {
                   </div>
                   {author.balance !== undefined && (
                     <div>
-                      <p className="text-xs text-gray-500">Solde</p>
+                      <p className="text-xs text-on-surface-muted">Solde</p>
                       <p className="font-semibold">{formatCurrency(Number(author.balance))}</p>
                     </div>
                   )}
                   {author.mtnNumber && (
                     <div>
-                      <p className="text-xs text-gray-500">MTN</p>
+                      <p className="text-xs text-on-surface-muted">MTN</p>
                       <p className="font-semibold">{author.mtnNumber}</p>
                     </div>
                   )}
                   {author.omNumber && (
                     <div>
-                      <p className="text-xs text-gray-500">Orange</p>
+                      <p className="text-xs text-on-surface-muted">Orange</p>
                       <p className="font-semibold">{author.omNumber}</p>
                     </div>
                   )}
@@ -328,11 +328,11 @@ export function BookDetailPage() {
 
         {/* Reviews Section */}
         {book.reviews && book.reviews.length > 0 && (
-          <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="rounded-lg border border-outline-variant bg-surface p-6">
             <h3 className="text-lg font-semibold mb-4">Derniers avis ({book.reviews.length})</h3>
             <div className="space-y-4">
               {book.reviews.map((review) => (
-                <div key={review.id} className="border-b border-gray-100 pb-4 last:border-0">
+                <div key={review.id} className="border-b border-outline-variant pb-4 last:border-0">
                   <div className="flex items-center gap-2 mb-2">
                     <Avatar
                       src={review.user?.avatarUrl}
@@ -343,14 +343,14 @@ export function BookDetailPage() {
                       <p className="font-medium text-sm">
                         {review.user?.firstName} {review.user?.lastName}
                       </p>
-                      <p className="text-xs text-gray-500">{formatDate(review.createdAt)}</p>
+                      <p className="text-xs text-on-surface-muted">{formatDate(review.createdAt)}</p>
                     </div>
                     <div className="ml-auto flex items-center gap-1">
                       {'*'.repeat(review.rating)}
-                      <span className="text-sm text-gray-500">({review.rating}/5)</span>
+                      <span className="text-sm text-on-surface-muted">({review.rating}/5)</span>
                     </div>
                   </div>
-                  {review.comment && <p className="text-sm text-gray-600">{review.comment}</p>}
+                  {review.comment && <p className="text-sm text-on-surface-variant">{review.comment}</p>}
                 </div>
               ))}
             </div>
@@ -391,9 +391,9 @@ export function BookDetailPage() {
               </div>
             </>
           ) : (
-            <div className="flex items-center justify-center h-full bg-gray-100 rounded">
+            <div className="flex items-center justify-center h-full bg-surface-container rounded">
               <div className="text-center">
-                <p className="text-gray-500 mb-4">
+                <p className="text-on-surface-muted mb-4">
                   Apercu non disponible pour ce format ({book.fileFormat || book.fileUrl?.split('.').pop() || 'inconnu'})
                 </p>
                 {fileUrl && (

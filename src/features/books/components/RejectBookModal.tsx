@@ -43,7 +43,7 @@ export function RejectBookModal({ bookId, onClose, onSuccess }: Props) {
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         placeholder="Motif du rejet (obligatoire)..."
-        className="w-full rounded-md border border-gray-300 p-3 text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20"
+        className="w-full rounded-md border border-outline-variant p-3 text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20"
         rows={4}
         required
       />

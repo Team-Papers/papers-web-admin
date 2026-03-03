@@ -57,7 +57,7 @@ export function BlogsPage() {
         a.coverUrl ? (
           <img src={a.coverUrl} alt={a.title} className="h-12 w-20 rounded-lg object-cover" />
         ) : (
-          <div className="flex h-12 w-20 items-center justify-center rounded-lg bg-gray-100 text-gray-400">
+          <div className="flex h-12 w-20 items-center justify-center rounded-lg bg-surface-container text-on-surface-muted">
             <Image size={20} />
           </div>
         ),
@@ -67,7 +67,7 @@ export function BlogsPage() {
       header: 'Titre',
       render: (a) => (
         <div>
-          <p className="font-medium text-gray-900 truncate max-w-[300px]">{a.title}</p>
+          <p className="font-medium text-on-surface truncate max-w-[300px]">{a.title}</p>
           {a.category && <p className="text-xs text-primary-500">{a.category}</p>}
         </div>
       ),
@@ -85,7 +85,7 @@ export function BlogsPage() {
       key: 'likes',
       header: 'Likes',
       render: (a) => (
-        <div className="flex items-center gap-1 text-gray-600">
+        <div className="flex items-center gap-1 text-on-surface-variant">
           <Heart size={14} />
           <span>{a.likesCount}</span>
         </div>
@@ -142,7 +142,7 @@ export function BlogsPage() {
               <SearchBar value={table.search} onChange={table.setSearch} />
             </div>
             <select
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+              className="rounded-md border border-outline-variant px-3 py-2 text-sm"
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
@@ -194,7 +194,7 @@ export function BlogsPage() {
           </>
         }
       >
-        <p className="text-sm text-gray-600">Cette action est irréversible. L'article sera définitivement supprimé.</p>
+        <p className="text-sm text-on-surface-variant">Cette action est irréversible. L'article sera définitivement supprimé.</p>
       </Modal>
     </>
   );

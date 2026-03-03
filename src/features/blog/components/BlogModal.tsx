@@ -131,7 +131,7 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
         />
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Catégories</label>
+          <label className="mb-1 block text-sm font-medium text-on-surface-variant">Catégories</label>
           {selectedCategories.length > 0 && (
             <div className="mb-2 flex flex-wrap gap-2">
               {selectedCategories.map((name) => (
@@ -151,7 +151,7 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
               ))}
             </div>
           )}
-          <div className="flex max-h-32 flex-wrap gap-2 overflow-y-auto rounded-md border border-gray-300 p-3">
+          <div className="flex max-h-32 flex-wrap gap-2 overflow-y-auto rounded-md border border-outline-variant p-3">
             {categories.map((cat) => {
               const isSelected = selectedCategories.includes(cat.name);
               return (
@@ -162,7 +162,7 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
                   className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                     isSelected
                       ? 'bg-primary-500 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
                   }`}
                 >
                   {cat.name}
@@ -170,7 +170,7 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
               );
             })}
             {categories.length === 0 && (
-              <span className="text-xs text-gray-400">Chargement des catégories...</span>
+              <span className="text-xs text-on-surface-muted">Chargement des catégories...</span>
             )}
           </div>
         </div>
@@ -184,19 +184,19 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
         />
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Contenu</label>
+          <label className="mb-1 block text-sm font-medium text-on-surface-variant">Contenu</label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={10}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-colors placeholder:text-gray-400 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20"
+            className="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-sm transition-colors placeholder:text-on-surface-muted focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20"
             placeholder="Contenu de l'article..."
             required
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Image de couverture</label>
+          <label className="mb-1 block text-sm font-medium text-on-surface-variant">Image de couverture</label>
           {coverUrl && (
             <img src={coverUrl} alt="Preview" className="mb-2 h-40 w-full rounded-lg object-cover" />
           )}
@@ -213,11 +213,11 @@ export function BlogModal({ isOpen, article, onClose, onSuccess }: Props) {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Statut</label>
+          <label className="mb-1 block text-sm font-medium text-on-surface-variant">Statut</label>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20"
+            className="w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20"
           >
             <option value={ArticleStatus.DRAFT}>{t('status.draft')}</option>
             <option value={ArticleStatus.PUBLISHED}>{t('status.published')}</option>

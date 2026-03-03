@@ -48,13 +48,13 @@ export function CategoriesPage() {
         <div className="flex justify-end">
           <Button leftIcon={<Plus size={16} />} onClick={() => setShowCreate(true)}>{t('actions.create')}</Button>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white">
+        <div className="rounded-lg border border-outline-variant bg-surface">
           {roots.map((cat) => (
             <div key={cat.id}>
-              <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+              <div className="flex items-center justify-between border-b border-outline-variant px-4 py-3">
                 <div>
-                  <span className="font-medium text-gray-900">{cat.icon && `${cat.icon} `}{cat.name}</span>
-                  {cat.description && <span className="ml-2 text-sm text-gray-500">— {cat.description}</span>}
+                  <span className="font-medium text-on-surface">{cat.icon && `${cat.icon} `}{cat.name}</span>
+                  {cat.description && <span className="ml-2 text-sm text-on-surface-muted">-- {cat.description}</span>}
                 </div>
                 <div className="flex gap-1">
                   <Button size="sm" variant="ghost" onClick={() => setEditCategory(cat)}><Edit2 size={14} /></Button>
@@ -62,8 +62,8 @@ export function CategoriesPage() {
                 </div>
               </div>
               {cat.children?.map((child) => (
-                <div key={child.id} className="flex items-center justify-between border-b border-gray-50 bg-gray-50 px-4 py-2 pl-10">
-                  <span className="text-sm text-gray-700">{child.icon && `${child.icon} `}{child.name}</span>
+                <div key={child.id} className="flex items-center justify-between border-b border-outline-variant bg-surface-container px-4 py-2 pl-10">
+                  <span className="text-sm text-on-surface-variant">{child.icon && `${child.icon} `}{child.name}</span>
                   <div className="flex gap-1">
                     <Button size="sm" variant="ghost" onClick={() => setEditCategory(child)}><Edit2 size={14} /></Button>
                     <Button size="sm" variant="ghost" onClick={() => setDeleteId(child.id)}><Trash2 size={14} /></Button>
@@ -72,7 +72,7 @@ export function CategoriesPage() {
               ))}
             </div>
           ))}
-          {roots.length === 0 && <p className="py-12 text-center text-sm text-gray-500">{t('table.noData')}</p>}
+          {roots.length === 0 && <p className="py-12 text-center text-sm text-on-surface-muted">{t('table.noData')}</p>}
         </div>
       </div>
 
@@ -95,7 +95,7 @@ export function CategoriesPage() {
           </>
         }
       >
-        <p className="text-sm text-gray-600">Cette action est irréversible.</p>
+        <p className="text-sm text-on-surface-variant">Cette action est irréversible.</p>
       </Modal>
     </>
   );

@@ -38,7 +38,7 @@ export function UsersPage() {
             <SearchBar value={table.search} onChange={table.setSearch} />
           </div>
           <select
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="rounded-md border border-outline-variant px-3 py-2 text-sm"
             value={table.filters.role || ''}
             onChange={(e) => table.setFilters({ ...table.filters, role: e.target.value })}
           >
@@ -46,7 +46,7 @@ export function UsersPage() {
             {Object.values(Role).map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
           <select
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="rounded-md border border-outline-variant px-3 py-2 text-sm"
             value={table.filters.status || ''}
             onChange={(e) => table.setFilters({ ...table.filters, status: e.target.value })}
           >
@@ -54,7 +54,7 @@ export function UsersPage() {
             {Object.values(UserStatus).map((s) => <option key={s} value={s}>{t(`status.${s.toLowerCase()}`)}</option>)}
           </select>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white">
+        <div className="rounded-lg border border-outline-variant bg-surface">
           <DataTable
             columns={columns}
             data={table.data}

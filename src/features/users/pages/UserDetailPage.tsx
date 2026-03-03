@@ -53,17 +53,17 @@ export function UserDetailPage() {
     <>
       <Header title={`${user.firstName} ${user.lastName}`} />
       <div className="p-6 space-y-6">
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
+        <div className="rounded-lg border border-outline-variant bg-surface p-6">
           <div className="flex items-start gap-4">
             <Avatar name={`${user.firstName} ${user.lastName}`} src={user.avatarUrl} size="lg" />
             <div className="flex-1">
               <h2 className="text-xl font-semibold">{user.firstName} {user.lastName}</h2>
-              <p className="text-gray-500">{user.email}</p>
+              <p className="text-on-surface-muted">{user.email}</p>
               <div className="mt-2 flex gap-2">
                 <Badge variant="info">{user.role}</Badge>
                 <Badge variant={statusVariant[user.status]}>{t(`status.${user.status.toLowerCase()}`)}</Badge>
               </div>
-              <p className="mt-2 text-sm text-gray-500">Inscrit le {formatDate(user.createdAt)}</p>
+              <p className="mt-2 text-sm text-on-surface-muted">Inscrit le {formatDate(user.createdAt)}</p>
             </div>
             <div className="flex gap-2">
               {user.role !== Role.ADMIN && user.status === UserStatus.ACTIVE && (
@@ -104,7 +104,7 @@ export function UserDetailPage() {
           </>
         }
       >
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-on-surface-variant">
           {confirmAction === 'delete' ? (
             <>Cette action est irréversible. Toutes les données de l'utilisateur seront supprimées définitivement.</>
           ) : (

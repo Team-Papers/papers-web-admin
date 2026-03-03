@@ -2,10 +2,10 @@ import { X, AlertCircle, CheckCircle, AlertTriangle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
 const config = {
-  success: { icon: CheckCircle, bg: 'bg-green-50 border-green-200 text-green-800' },
-  warning: { icon: AlertTriangle, bg: 'bg-yellow-50 border-yellow-200 text-yellow-800' },
-  error: { icon: AlertCircle, bg: 'bg-red-50 border-red-200 text-red-800' },
-  info: { icon: Info, bg: 'bg-blue-50 border-blue-200 text-blue-800' },
+  success: { icon: CheckCircle, bg: 'bg-success-container border-success text-success-dark' },
+  warning: { icon: AlertTriangle, bg: 'bg-warning-container border-warning text-warning-dark' },
+  error: { icon: AlertCircle, bg: 'bg-error-container border-error text-error-dark' },
+  info: { icon: Info, bg: 'bg-info-container border-info text-info-dark' },
 } as const;
 
 interface AlertProps {

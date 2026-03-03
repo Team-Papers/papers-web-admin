@@ -1,4 +1,4 @@
-import { Inbox } from 'lucide-react';
+import { ChevronUp, ChevronDown, ChevronsUpDown, Inbox } from 'lucide-react';
 import { Spinner } from '@/components/atoms/Spinner';
 import { Pagination } from '@/components/molecules/Pagination';
 import { useTranslation } from 'react-i18next';
@@ -22,10 +22,14 @@ interface DataTableProps<T> {
   onPageChange: (page: number) => void;
   onRowClick?: (item: T) => void;
   keyExtractor: (item: T) => string;
+  orderBy?: string;
+  direction?: 'asc' | 'desc';
+  onSort?: (field: string) => void;
 }
 
 export function DataTable<T>({
-  columns, data, isLoading, page, totalPages, total, limit, onPageChange, onRowClick, keyExtractor,
+  columns, data, isLoading, page, totalPages, total, limit,
+  onPageChange, onRowClick, keyExtractor, orderBy, direction, onSort,
 }: DataTableProps<T>) {
   const { t } = useTranslation();
 
@@ -58,11 +62,29 @@ export function DataTable<T>({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`whitespace-nowrap px-5 py-4 text-xs font-semibold uppercase tracking-wider text-on-surface-variant ${
-                    col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'
-                  }`}
+                  onClick={col.sortable && onSort ? () => onSort(col.key) : undefined}
+                  className={[
+                    'whitespace-nowrap px-5 py-4 text-xs font-semibold uppercase tracking-wider text-on-surface-variant',
+                    col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
+                    col.sortable && onSort ? 'cursor-pointer select-none hover:text-on-surface transition-colors' : '',
+                  ].join(' ')}
                 >
-                  {col.header}
+                  <span className="inline-flex items-center gap-1">
+                    {col.header}
+                    {col.sortable && onSort && (
+                      <span className="ml-0.5">
+                        {orderBy === col.key ? (
+                          direction === 'asc' ? (
+                            <ChevronUp className="h-3.5 w-3.5 text-primary" />
+                          ) : (
+                            <ChevronDown className="h-3.5 w-3.5 text-primary" />
+                          )
+                        ) : (
+                          <ChevronsUpDown className="h-3.5 w-3.5 opacity-40" />
+                        )}
+                      </span>
+                    )}
+                  </span>
                 </th>
               ))}
             </tr>

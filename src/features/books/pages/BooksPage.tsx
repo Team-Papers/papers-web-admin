@@ -49,14 +49,14 @@ export function BooksPage() {
         ),
     },
     {
-      key: 'title', header: 'Titre', render: (b) => (
+      key: 'title', header: 'Titre', sortable: true, render: (b) => (
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{b.title}</p>
           {b.author && <p className="truncate text-xs text-on-surface-variant">{b.author.penName || ''}</p>}
         </div>
       ),
     },
-    { key: 'price', header: 'Prix', render: (b) => formatCurrency(b.price) },
+    { key: 'price', header: 'Prix', sortable: true, render: (b) => formatCurrency(b.price) },
     { key: 'status', header: 'Statut', render: (b) => <Badge variant={statusVariant[b.status]}>{t(`status.${b.status.toLowerCase()}`)}</Badge> },
     { key: 'totalSales', header: 'Ventes', render: (b) => <span className="font-medium">{b._count?.purchases ?? 0}</span> },
     {
@@ -98,7 +98,7 @@ export function BooksPage() {
             </select>
           )}
         </div>
-        <DataTable columns={columns} data={table.data} isLoading={table.isLoading} page={table.page} totalPages={table.totalPages} total={table.total} limit={table.limit} onPageChange={table.setPage} onRowClick={(b) => navigate(`/books/${b.id}`)} keyExtractor={(b) => b.id} />
+        <DataTable columns={columns} data={table.data} isLoading={table.isLoading} page={table.page} totalPages={table.totalPages} total={table.total} limit={table.limit} onPageChange={table.setPage} onRowClick={(b) => navigate(`/books/${b.id}`)} keyExtractor={(b) => b.id} orderBy={table.orderBy} direction={table.direction} onSort={table.toggleSort} />
       </div>
       <RejectBookModal bookId={rejectId} onClose={() => setRejectId(null)} onSuccess={() => { setRejectId(null); table.refetch(); }} />
     </>

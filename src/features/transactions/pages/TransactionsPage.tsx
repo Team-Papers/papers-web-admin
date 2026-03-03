@@ -123,6 +123,7 @@ export function TransactionsPage() {
     {
       key: 'amount',
       header: 'Montant',
+      sortable: true,
       render: (tx) => (
         <span className={`font-semibold ${tx.type === TransactionType.SALE ? 'text-success' : 'text-error'}`}>
           {tx.type === TransactionType.SALE ? '+' : '-'}{formatCurrency(tx.amount)}
@@ -195,6 +196,7 @@ export function TransactionsPage() {
     {
       key: 'createdAt',
       header: 'Date',
+      sortable: true,
       render: (tx) => <span className="text-sm text-on-surface-variant">{formatDateTime(tx.createdAt)}</span>,
     },
   ];
@@ -236,6 +238,9 @@ export function TransactionsPage() {
           onPageChange={table.setPage}
           onRowClick={openDetail}
           keyExtractor={(tx) => tx.id}
+          orderBy={table.orderBy}
+          direction={table.direction}
+          onSort={table.toggleSort}
         />
       </div>
 

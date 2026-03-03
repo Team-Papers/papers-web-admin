@@ -100,7 +100,7 @@ export function CollectionModal({ isOpen, collection, onClose, onSuccess }: Prop
         <FormField label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Image</label>
+          <label className="mb-1 block text-sm font-medium text-on-surface-variant">Image</label>
           {imageUrl && (
             <img src={imageUrl} alt="Preview" className="mb-2 h-32 w-full rounded-lg object-cover" />
           )}

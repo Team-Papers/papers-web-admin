@@ -57,7 +57,7 @@ export function AuthorsPage() {
     },
     { key: 'bio', header: 'Bio', render: (a) => <span className="max-w-xs truncate block text-on-surface-variant">{a.bio || '—'}</span> },
     { key: 'status', header: 'Statut', render: (a) => <Badge variant={statusVariant[a.status]}>{t(`status.${a.status.toLowerCase()}`)}</Badge> },
-    { key: 'createdAt', header: 'Date', render: (a) => formatDate(a.createdAt) },
+    { key: 'createdAt', header: 'Date', sortable: true, render: (a) => formatDate(a.createdAt) },
     {
       key: 'actions', header: 'Actions', render: (a) =>
         a.status === AuthorStatus.PENDING ? (
@@ -107,6 +107,7 @@ export function AuthorsPage() {
           columns={columns} data={table.data} isLoading={table.isLoading}
           page={table.page} totalPages={table.totalPages} total={table.total} limit={table.limit}
           onPageChange={table.setPage} onRowClick={(a) => navigate(`/authors/${a.id}`)} keyExtractor={(a) => a.id}
+          orderBy={table.orderBy} direction={table.direction} onSort={table.toggleSort}
         />
       </div>
       <RejectAuthorModal authorId={rejectId} onClose={() => setRejectId(null)} onSuccess={() => { setRejectId(null); table.refetch(); }} />

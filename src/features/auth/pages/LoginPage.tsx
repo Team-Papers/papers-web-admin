@@ -32,7 +32,7 @@ export function LoginPage() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-900">{t('login')}</h2>
+      <h2 className="text-xl font-semibold text-on-surface">{t('login')}</h2>
       {error && <Alert variant="error">{error}</Alert>}
       <FormField
         label={t('email')}

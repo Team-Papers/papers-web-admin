@@ -51,7 +51,7 @@ export function ReviewsPage() {
         <Star
           key={i}
           size={14}
-          className={i < rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}
+          className={i < rating ? 'fill-amber-400 text-amber-400' : 'text-on-surface-muted'}
         />
       ))}
     </div>
@@ -85,7 +85,7 @@ export function ReviewsPage() {
       key: 'comment',
       header: 'Commentaire',
       render: (r) => (
-        <span className="truncate max-w-[250px] block text-gray-600">
+        <span className="truncate max-w-[250px] block text-on-surface-variant">
           {r.comment || '-'}
         </span>
       ),
@@ -159,7 +159,7 @@ export function ReviewsPage() {
             <SearchBar value={table.search} onChange={table.setSearch} />
           </div>
           <select
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="rounded-md border border-outline-variant px-3 py-2 text-sm"
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value);
@@ -174,7 +174,7 @@ export function ReviewsPage() {
             ))}
           </select>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white">
+        <div className="rounded-lg border border-outline-variant bg-surface">
           <DataTable
             columns={columns}
             data={table.data}
