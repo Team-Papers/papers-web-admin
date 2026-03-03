@@ -32,8 +32,8 @@ export async function rejectBook(id: string, reason: string): Promise<Book> {
   return res.data.data;
 }
 
-export async function suspendBook(id: string): Promise<Book> {
-  const res = await apiClient.put<ApiResponse<Book>>(`/admin/books/${id}/suspend`);
+export async function suspendBook(id: string, reason: string): Promise<Book> {
+  const res = await apiClient.put<ApiResponse<Book>>(`/admin/books/${id}/suspend`, { reason });
   return res.data.data;
 }
 

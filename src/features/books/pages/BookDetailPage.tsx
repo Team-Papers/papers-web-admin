@@ -7,8 +7,9 @@ import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
 import { Avatar } from '@/components/atoms/Avatar';
 import { Modal } from '@/components/molecules/Modal';
-import { getBookById, approveBook, suspendBook, unsuspendBook, getBookDownloadLink } from '@/lib/api/books';
+import { getBookById, approveBook, unsuspendBook, getBookDownloadLink } from '@/lib/api/books';
 import { RejectBookModal } from '../components/RejectBookModal';
+import { SuspendBookModal } from '../components/SuspendBookModal';
 import { formatCurrency, formatDate } from '@/lib/utils/formatters';
 import type { Book, Category } from '@/types/models';
 import { BookStatus } from '@/types/models';
@@ -38,6 +39,7 @@ export function BookDetailPage() {
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [rejectOpen, setRejectOpen] = useState(false);
+  const [suspendOpen, setSuspendOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
@@ -76,16 +78,6 @@ export function BookDetailPage() {
     setActionLoading(true);
     try {
       await approveBook(book.id);
-      fetchBook();
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleSuspend = async () => {
-    setActionLoading(true);
-    try {
-      await suspendBook(book.id);
       fetchBook();
     } finally {
       setActionLoading(false);
@@ -177,6 +169,13 @@ export function BookDetailPage() {
                 </div>
               )}
 
+              {book.status === BookStatus.SUSPENDED && book.suspensionReason && (
+                <div className="bg-error-container border border-error rounded-lg p-3">
+                  <p className="text-sm font-medium text-error-dark">Motif de la suspension :</p>
+                  <p className="text-sm text-error-dark">{book.suspensionReason}</p>
+                </div>
+              )}
+
               {/* Rejection History */}
               {book.rejectionHistory && book.rejectionHistory.length > 0 && (
                 <div className="bg-warning-container border border-warning rounded-lg p-3">
@@ -262,8 +261,8 @@ export function BookDetailPage() {
                   </>
                 )}
                 {(book.status === BookStatus.APPROVED || book.status === BookStatus.PUBLISHED) && (
-                  <Button variant="danger" onClick={handleSuspend} disabled={actionLoading}>
-                    {actionLoading ? 'Chargement...' : 'Suspendre'}
+                  <Button variant="danger" onClick={() => setSuspendOpen(true)} disabled={actionLoading}>
+                    Suspendre
                   </Button>
                 )}
                 {book.status === BookStatus.SUSPENDED && (
@@ -381,6 +380,16 @@ export function BookDetailPage() {
         onClose={() => setRejectOpen(false)}
         onSuccess={() => {
           setRejectOpen(false);
+          fetchBook();
+        }}
+      />
+
+      {/* Suspend Modal */}
+      <SuspendBookModal
+        bookId={suspendOpen ? book.id : null}
+        onClose={() => setSuspendOpen(false)}
+        onSuccess={() => {
+          setSuspendOpen(false);
           fetchBook();
         }}
       />

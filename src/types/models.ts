@@ -123,6 +123,7 @@ export interface Book {
   status: BookStatus;
   rejectionReason?: string;
   rejectionHistory?: Array<{ reason: string; date: string }>;
+  suspensionReason?: string;
   previewPercent?: number;
   publishedAt?: string;
   authorId: string;
