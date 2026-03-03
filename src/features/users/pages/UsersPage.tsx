@@ -21,11 +21,11 @@ export function UsersPage() {
   const table = useDataTable<User>(fetchFn);
 
   const columns: Column<User>[] = [
-    { key: 'name', header: 'Nom', render: (u) => `${u.firstName} ${u.lastName}` },
+    { key: 'firstName', header: 'Nom', sortable: true, render: (u) => `${u.firstName} ${u.lastName}` },
     { key: 'email', header: 'E-mail' },
     { key: 'role', header: 'Rôle', render: (u) => <Badge variant="info">{u.role}</Badge> },
     { key: 'status', header: 'Statut', render: (u) => <Badge variant={statusVariant[u.status]}>{t(`status.${u.status.toLowerCase()}`)}</Badge> },
-    { key: 'createdAt', header: 'Inscription', render: (u) => formatDate(u.createdAt) },
+    { key: 'createdAt', header: 'Inscription', sortable: true, render: (u) => formatDate(u.createdAt) },
   ];
 
   return (
@@ -66,6 +66,9 @@ export function UsersPage() {
             onPageChange={table.setPage}
             onRowClick={(u) => navigate(`/users/${u.id}`)}
             keyExtractor={(u) => u.id}
+            orderBy={table.orderBy}
+            direction={table.direction}
+            onSort={table.toggleSort}
           />
         </div>
       </div>
