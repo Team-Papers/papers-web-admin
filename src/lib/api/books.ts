@@ -37,6 +37,11 @@ export async function suspendBook(id: string): Promise<Book> {
   return res.data.data;
 }
 
+export async function unsuspendBook(id: string): Promise<Book> {
+  const res = await apiClient.put<ApiResponse<Book>>(`/admin/books/${id}/unsuspend`);
+  return res.data.data;
+}
+
 export interface DownloadLinkResponse {
   downloadUrl: string;
   expiresAt: string;

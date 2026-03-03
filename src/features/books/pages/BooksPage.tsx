@@ -17,6 +17,7 @@ import { BookStatus } from '@/types/models';
 const statusVariant = {
   [BookStatus.DRAFT]: 'neutral', [BookStatus.PENDING]: 'warning',
   [BookStatus.APPROVED]: 'success', [BookStatus.REJECTED]: 'error', [BookStatus.PUBLISHED]: 'info',
+  [BookStatus.SUSPENDED]: 'error',
 } as const;
 type Tab = 'PENDING' | 'ALL';
 
@@ -95,6 +96,7 @@ export function BooksPage() {
               <option value="APPROVED">Approuvé</option>
               <option value="REJECTED">Rejeté</option>
               <option value="PUBLISHED">Publié</option>
+              <option value="SUSPENDED">Suspendu</option>
             </select>
           )}
         </div>

@@ -7,7 +7,7 @@ import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
 import { Avatar } from '@/components/atoms/Avatar';
 import { Modal } from '@/components/molecules/Modal';
-import { getBookById, approveBook, suspendBook, getBookDownloadLink } from '@/lib/api/books';
+import { getBookById, approveBook, suspendBook, unsuspendBook, getBookDownloadLink } from '@/lib/api/books';
 import { RejectBookModal } from '../components/RejectBookModal';
 import { formatCurrency, formatDate } from '@/lib/utils/formatters';
 import type { Book, Category } from '@/types/models';
@@ -19,6 +19,7 @@ const statusVariant = {
   [BookStatus.APPROVED]: 'success',
   [BookStatus.REJECTED]: 'error',
   [BookStatus.PUBLISHED]: 'info',
+  [BookStatus.SUSPENDED]: 'error',
 } as const;
 
 const statusLabels: Record<BookStatus, string> = {
@@ -27,6 +28,7 @@ const statusLabels: Record<BookStatus, string> = {
   [BookStatus.APPROVED]: 'Approuvé',
   [BookStatus.REJECTED]: 'Rejeté',
   [BookStatus.PUBLISHED]: 'Publié',
+  [BookStatus.SUSPENDED]: 'Suspendu',
 };
 
 export function BookDetailPage() {
@@ -84,6 +86,16 @@ export function BookDetailPage() {
     setActionLoading(true);
     try {
       await suspendBook(book.id);
+      fetchBook();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUnsuspend = async () => {
+    setActionLoading(true);
+    try {
+      await unsuspendBook(book.id);
       fetchBook();
     } finally {
       setActionLoading(false);
@@ -250,8 +262,13 @@ export function BookDetailPage() {
                   </>
                 )}
                 {(book.status === BookStatus.APPROVED || book.status === BookStatus.PUBLISHED) && (
-                  <Button variant="secondary" onClick={handleSuspend} disabled={actionLoading}>
-                    {actionLoading ? 'Chargement...' : t('actions.suspend')}
+                  <Button variant="danger" onClick={handleSuspend} disabled={actionLoading}>
+                    {actionLoading ? 'Chargement...' : 'Suspendre'}
+                  </Button>
+                )}
+                {book.status === BookStatus.SUSPENDED && (
+                  <Button variant="primary" onClick={handleUnsuspend} disabled={actionLoading}>
+                    {actionLoading ? 'Chargement...' : 'Réactiver'}
                   </Button>
                 )}
               </div>

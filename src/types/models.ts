@@ -22,6 +22,7 @@ export enum BookStatus {
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
   PUBLISHED = 'PUBLISHED',
+  SUSPENDED = 'SUSPENDED',
 }
 
 export enum TransactionType {
