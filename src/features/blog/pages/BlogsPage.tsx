@@ -65,6 +65,7 @@ export function BlogsPage() {
     {
       key: 'title',
       header: 'Titre',
+      sortable: true,
       render: (a) => (
         <div>
           <p className="font-medium text-on-surface truncate max-w-[300px]">{a.title}</p>
@@ -94,11 +95,13 @@ export function BlogsPage() {
     {
       key: 'publishedAt',
       header: 'Publié le',
+      sortable: true,
       render: (a) => a.publishedAt ? formatDate(a.publishedAt) : '-',
     },
     {
       key: 'createdAt',
       header: 'Créé le',
+      sortable: true,
       render: (a) => formatDate(a.createdAt),
     },
     {
@@ -173,6 +176,7 @@ export function BlogsPage() {
           onPageChange={table.setPage}
           onRowClick={(a) => navigate(`/blog/${a.id}`)}
           keyExtractor={(a) => a.id}
+          orderBy={table.orderBy} direction={table.direction} onSort={table.toggleSort}
         />
       </div>
 

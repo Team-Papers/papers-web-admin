@@ -79,6 +79,7 @@ export function ReviewsPage() {
     {
       key: 'rating',
       header: 'Note',
+      sortable: true,
       render: (r) => renderStars(r.rating),
     },
     {
@@ -102,6 +103,7 @@ export function ReviewsPage() {
     {
       key: 'createdAt',
       header: 'Date',
+      sortable: true,
       render: (r) => formatDate(r.createdAt),
     },
     {
@@ -185,6 +187,7 @@ export function ReviewsPage() {
             limit={table.limit}
             onPageChange={table.setPage}
             keyExtractor={(r) => r.id}
+            orderBy={table.orderBy} direction={table.direction} onSort={table.toggleSort}
           />
         </div>
       </div>

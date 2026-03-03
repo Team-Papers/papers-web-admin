@@ -36,7 +36,7 @@ export function AuthorsPage() {
 
   const columns: Column<AuthorProfile>[] = [
     {
-      key: 'user', header: 'Auteur', render: (a) => {
+      key: 'penName', header: 'Auteur', sortable: true, render: (a) => {
         const name = a.user ? `${a.user.firstName} ${a.user.lastName}` : a.userId;
         return (
           <div className="flex items-center gap-2">
