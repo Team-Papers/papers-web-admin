@@ -86,7 +86,7 @@ export function BooksPage() {
     },
     {
       key: 'title', header: 'Titre', sortable: true, render: (b) => (
-        <div className="min-w-0">
+        <div className="min-w-0 max-w-[250px]">
           <p className="truncate text-sm font-medium">{b.title}</p>
           {b.author && <p className="truncate text-xs text-on-surface-variant">{b.author.penName || ''}</p>}
         </div>
