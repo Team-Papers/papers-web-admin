@@ -42,6 +42,15 @@ export async function unsuspendBook(id: string): Promise<Book> {
   return res.data.data;
 }
 
+export async function unpublishBook(id: string): Promise<Book> {
+  const res = await apiClient.put<ApiResponse<Book>>(`/admin/books/${id}/unpublish`);
+  return res.data.data;
+}
+
+export async function deleteBook(id: string): Promise<void> {
+  await apiClient.delete(`/admin/books/${id}`);
+}
+
 export interface DownloadLinkResponse {
   downloadUrl: string;
   expiresAt: string;

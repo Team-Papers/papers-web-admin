@@ -14,19 +14,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor={inputId} className="mb-1 block text-sm font-medium text-on-surface-variant">
             {label}
           </label>
         )}
         <div className="relative">
           {leftIcon && (
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{leftIcon}</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-muted">{leftIcon}</span>
           )}
           <input
             ref={ref}
             id={inputId}
             className={cn(
-              'w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors placeholder:text-gray-400 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20',
+              'w-full rounded-xl border border-outline bg-surface px-3 py-2.5 text-sm text-on-surface transition-colors placeholder:text-on-surface-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               error && 'border-error focus:border-error focus:ring-error/20',
@@ -35,7 +35,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {rightIcon && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">{rightIcon}</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-muted">{rightIcon}</span>
           )}
         </div>
         {error && <p className="mt-1 text-sm text-error">{error}</p>}

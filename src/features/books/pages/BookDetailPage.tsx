@@ -7,7 +7,7 @@ import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
 import { Avatar } from '@/components/atoms/Avatar';
 import { Modal } from '@/components/molecules/Modal';
-import { getBookById, approveBook, unsuspendBook, getBookDownloadLink } from '@/lib/api/books';
+import { getBookById, approveBook, unsuspendBook, unpublishBook, deleteBook, getBookDownloadLink } from '@/lib/api/books';
 import { RejectBookModal } from '../components/RejectBookModal';
 import { SuspendBookModal } from '../components/SuspendBookModal';
 import { formatCurrency, formatDate } from '@/lib/utils/formatters';
@@ -40,6 +40,8 @@ export function BookDetailPage() {
   const [loading, setLoading] = useState(true);
   const [rejectOpen, setRejectOpen] = useState(false);
   const [suspendOpen, setSuspendOpen] = useState(false);
+  const [unpublishOpen, setUnpublishOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
@@ -89,6 +91,27 @@ export function BookDetailPage() {
     try {
       await unsuspendBook(book.id);
       fetchBook();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUnpublish = async () => {
+    setActionLoading(true);
+    try {
+      await unpublishBook(book.id);
+      setUnpublishOpen(false);
+      fetchBook();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setActionLoading(true);
+    try {
+      await deleteBook(book.id);
+      navigate('/books');
     } finally {
       setActionLoading(false);
     }
@@ -244,7 +267,7 @@ export function BookDetailPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-4">
+              <div className="flex flex-wrap gap-2 pt-4">
                 {book.fileUrl && (
                   <Button variant="secondary" onClick={handleOpenFile} disabled={fileLoading}>
                     {fileLoading ? 'Chargement...' : 'Voir le fichier'}
@@ -265,11 +288,19 @@ export function BookDetailPage() {
                     Suspendre
                   </Button>
                 )}
+                {book.status === BookStatus.PUBLISHED && (
+                  <Button variant="secondary" onClick={() => setUnpublishOpen(true)} disabled={actionLoading}>
+                    Retirer en ligne
+                  </Button>
+                )}
                 {book.status === BookStatus.SUSPENDED && (
                   <Button variant="primary" onClick={handleUnsuspend} disabled={actionLoading}>
                     {actionLoading ? 'Chargement...' : 'Réactiver'}
                   </Button>
                 )}
+                <Button variant="danger" onClick={() => setDeleteOpen(true)} disabled={actionLoading}>
+                  Supprimer
+                </Button>
               </div>
             </div>
           </div>
@@ -393,6 +424,50 @@ export function BookDetailPage() {
           fetchBook();
         }}
       />
+
+      {/* Unpublish Modal */}
+      <Modal
+        isOpen={unpublishOpen}
+        onClose={() => setUnpublishOpen(false)}
+        title="Retirer le livre en ligne"
+      >
+        <div className="space-y-4">
+          <p className="text-on-surface-variant">
+            Etes-vous sur de vouloir retirer <strong>{book.title}</strong> de la publication ?
+            Le livre repassera en brouillon et ne sera plus visible par les lecteurs.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setUnpublishOpen(false)}>
+              Annuler
+            </Button>
+            <Button variant="danger" onClick={handleUnpublish} disabled={actionLoading}>
+              {actionLoading ? 'Chargement...' : 'Retirer en ligne'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Modal */}
+      <Modal
+        isOpen={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        title="Supprimer le livre"
+      >
+        <div className="space-y-4">
+          <p className="text-on-surface-variant">
+            Etes-vous sur de vouloir supprimer definitivement <strong>{book.title}</strong> ?
+            Cette action est irreversible. Toutes les donnees associees (achats, avis) seront perdues.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setDeleteOpen(false)}>
+              Annuler
+            </Button>
+            <Button variant="danger" onClick={handleDelete} disabled={actionLoading}>
+              {actionLoading ? 'Chargement...' : 'Supprimer definitivement'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* File Preview Modal */}
       <Modal

@@ -1,15 +1,17 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Check, X, BookOpen } from 'lucide-react';
+import { Check, X, BookOpen, Ban, RotateCcw, BookX, Trash2 } from 'lucide-react';
 import { Header } from '@/components/organisms/Header';
 import { SearchBar } from '@/components/molecules/SearchBar';
 import { DataTable, type Column } from '@/components/organisms/DataTable';
 import { Badge } from '@/components/atoms/Badge';
 import { Button } from '@/components/atoms/Button';
+import { Modal } from '@/components/molecules/Modal';
 import { useDataTable } from '@/lib/hooks/useDataTable';
-import { getBooks, approveBook } from '@/lib/api/books';
+import { getBooks, approveBook, unsuspendBook, unpublishBook, deleteBook } from '@/lib/api/books';
 import { RejectBookModal } from '../components/RejectBookModal';
+import { SuspendBookModal } from '../components/SuspendBookModal';
 import { formatCurrency } from '@/lib/utils/formatters';
 import type { Book } from '@/types/models';
 import { BookStatus } from '@/types/models';
@@ -26,6 +28,10 @@ export function BooksPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('ALL');
   const [rejectId, setRejectId] = useState<string | null>(null);
+  const [suspendId, setSuspendId] = useState<string | null>(null);
+  const [unpublishTarget, setUnpublishTarget] = useState<Book | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Book | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const fetchFn = useCallback(
     (p: Record<string, unknown>) => getBooks({ ...p, ...(tab === 'PENDING' ? { status: 'PENDING' } : {}) } as Parameters<typeof getBooks>[0]),
@@ -36,6 +42,35 @@ export function BooksPage() {
   const handleApprove = async (id: string) => {
     await approveBook(id);
     table.refetch();
+  };
+
+  const handleUnsuspend = async (id: string) => {
+    await unsuspendBook(id);
+    table.refetch();
+  };
+
+  const handleUnpublish = async () => {
+    if (!unpublishTarget) return;
+    setActionLoading(true);
+    try {
+      await unpublishBook(unpublishTarget.id);
+      setUnpublishTarget(null);
+      table.refetch();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setActionLoading(true);
+    try {
+      await deleteBook(deleteTarget.id);
+      setDeleteTarget(null);
+      table.refetch();
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const columns: Column<Book>[] = [
@@ -61,13 +96,38 @@ export function BooksPage() {
     { key: 'status', header: 'Statut', render: (b) => <Badge variant={statusVariant[b.status]}>{t(`status.${b.status.toLowerCase()}`)}</Badge> },
     { key: 'totalSales', header: 'Ventes', render: (b) => <span className="font-medium">{b._count?.purchases ?? 0}</span> },
     {
-      key: 'actions', header: 'Actions', render: (b) =>
-        b.status === BookStatus.PENDING ? (
-          <div className="flex gap-1">
-            <Button size="sm" variant="primary" leftIcon={<Check size={14} />} onClick={(e) => { e.stopPropagation(); handleApprove(b.id); }}>{t('actions.approve')}</Button>
-            <Button size="sm" variant="danger" leftIcon={<X size={14} />} onClick={(e) => { e.stopPropagation(); setRejectId(b.id); }}>{t('actions.reject')}</Button>
-          </div>
-        ) : null,
+      key: 'actions', header: 'Actions', render: (b) => (
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {b.status === BookStatus.PENDING && (
+            <>
+              <button onClick={() => handleApprove(b.id)} className="rounded-lg p-1.5 text-success hover:bg-success-container transition-colors" title="Approuver">
+                <Check size={16} />
+              </button>
+              <button onClick={() => setRejectId(b.id)} className="rounded-lg p-1.5 text-error hover:bg-error-container transition-colors" title="Rejeter">
+                <X size={16} />
+              </button>
+            </>
+          )}
+          {(b.status === BookStatus.PUBLISHED || b.status === BookStatus.APPROVED) && (
+            <button onClick={() => setSuspendId(b.id)} className="rounded-lg p-1.5 text-warning hover:bg-warning-container transition-colors" title="Suspendre">
+              <Ban size={16} />
+            </button>
+          )}
+          {b.status === BookStatus.PUBLISHED && (
+            <button onClick={() => setUnpublishTarget(b)} className="rounded-lg p-1.5 text-on-surface-variant hover:bg-surface-container transition-colors" title="Retirer en ligne">
+              <BookX size={16} />
+            </button>
+          )}
+          {b.status === BookStatus.SUSPENDED && (
+            <button onClick={() => handleUnsuspend(b.id)} className="rounded-lg p-1.5 text-primary hover:bg-primary-container transition-colors" title="Reactiver">
+              <RotateCcw size={16} />
+            </button>
+          )}
+          <button onClick={() => setDeleteTarget(b)} className="rounded-lg p-1.5 text-error hover:bg-error-container transition-colors" title="Supprimer">
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
     },
   ];
 
@@ -102,7 +162,50 @@ export function BooksPage() {
         </div>
         <DataTable columns={columns} data={table.data} isLoading={table.isLoading} page={table.page} totalPages={table.totalPages} total={table.total} limit={table.limit} onPageChange={table.setPage} onRowClick={(b) => navigate(`/books/${b.id}`)} keyExtractor={(b) => b.id} orderBy={table.orderBy} direction={table.direction} onSort={table.toggleSort} />
       </div>
+
+      {/* Reject Modal */}
       <RejectBookModal bookId={rejectId} onClose={() => setRejectId(null)} onSuccess={() => { setRejectId(null); table.refetch(); }} />
+
+      {/* Suspend Modal */}
+      <SuspendBookModal bookId={suspendId} onClose={() => setSuspendId(null)} onSuccess={() => { setSuspendId(null); table.refetch(); }} />
+
+      {/* Unpublish Modal */}
+      <Modal
+        isOpen={!!unpublishTarget}
+        onClose={() => setUnpublishTarget(null)}
+        title="Retirer le livre en ligne"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-on-surface-variant">
+            Etes-vous sur de vouloir retirer <strong>{unpublishTarget?.title}</strong> de la publication ?
+            Le livre repassera en brouillon.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setUnpublishTarget(null)}>Annuler</Button>
+            <Button variant="danger" onClick={handleUnpublish} isLoading={actionLoading}>Retirer en ligne</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Modal */}
+      <Modal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Supprimer le livre"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-on-surface-variant">
+            Etes-vous sur de vouloir supprimer definitivement <strong>{deleteTarget?.title}</strong> ?
+            Cette action est irreversible.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setDeleteTarget(null)}>Annuler</Button>
+            <Button variant="danger" onClick={handleDelete} isLoading={actionLoading}>Supprimer definitivement</Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

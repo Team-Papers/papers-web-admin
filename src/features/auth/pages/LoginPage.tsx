@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { FormField } from '@/components/molecules/FormField';
 import { Button } from '@/components/atoms/Button';
 import { Alert } from '@/components/molecules/Alert';
@@ -13,6 +13,7 @@ export function LoginPage() {
   const login = useAuthStore((s) => s.login);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,8 +32,11 @@ export function LoginPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-semibold text-on-surface">{t('login')}</h2>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="text-center">
+        <h2 className="text-xl font-bold text-on-surface">{t('login')}</h2>
+        <p className="mt-1 text-sm text-on-surface-variant">Connectez-vous a votre espace administrateur</p>
+      </div>
       {error && <Alert variant="error">{error}</Alert>}
       <FormField
         label={t('email')}
@@ -40,14 +44,26 @@ export function LoginPage() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         leftIcon={<Mail size={16} />}
+        placeholder="admin@papers237.com"
         required
       />
       <FormField
         label={t('password')}
-        type="password"
+        type={showPassword ? 'text' : 'password'}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         leftIcon={<Lock size={16} />}
+        placeholder="Votre mot de passe"
+        rightIcon={
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+            tabIndex={-1}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        }
         required
       />
       <Button type="submit" isLoading={loading} className="w-full">
