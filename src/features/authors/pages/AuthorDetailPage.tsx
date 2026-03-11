@@ -26,6 +26,7 @@ const bookStatusVariant = {
   [BookStatus.APPROVED]: 'success',
   [BookStatus.REJECTED]: 'error',
   [BookStatus.PUBLISHED]: 'info',
+  [BookStatus.SUSPENDED]: 'error',
 } as const;
 
 function CopyableId({ value }: { value: string }) {
