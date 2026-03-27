@@ -1,6 +1,6 @@
 import type { ApiResponse, ApiPaginatedRaw, PaginatedResponse } from '@/types/api';
 import { toPaginated } from '@/types/api';
-import type { AuthorProfile, AuthorDetail } from '@/types/models';
+import type { AuthorProfile, AuthorDetail, User } from '@/types/models';
 import apiClient from './client';
 
 export interface AuthorsParams {
@@ -30,4 +30,23 @@ export async function approveAuthor(id: string): Promise<AuthorProfile> {
 export async function rejectAuthor(id: string, reason: string): Promise<AuthorProfile> {
   const res = await apiClient.put<ApiResponse<AuthorProfile>>(`/admin/authors/${id}/reject`, { reason });
   return res.data.data;
+}
+
+export async function suspendAuthorUser(userId: string): Promise<User> {
+  const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${userId}/suspend`);
+  return res.data.data;
+}
+
+export async function banAuthorUser(userId: string): Promise<User> {
+  const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${userId}/ban`);
+  return res.data.data;
+}
+
+export async function activateAuthorUser(userId: string): Promise<User> {
+  const res = await apiClient.put<ApiResponse<User>>(`/admin/users/${userId}/activate`);
+  return res.data.data;
+}
+
+export async function deleteAuthorUser(userId: string): Promise<void> {
+  await apiClient.delete(`/admin/users/${userId}`);
 }

@@ -4,15 +4,21 @@ import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft, BookOpen, DollarSign, TrendingUp, TrendingDown,
   Users, Globe, Mail, Phone, Calendar,
-  Copy, Check, ExternalLink,
+  Copy, Check, ExternalLink, X, Ban, ShieldOff, RotateCcw, Trash2, UserX,
 } from 'lucide-react';
 import { Header } from '@/components/organisms/Header';
 import { Badge } from '@/components/atoms/Badge';
+import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
-import { getAuthorById } from '@/lib/api/authors';
+import {
+  getAuthorById, approveAuthor,
+  suspendAuthorUser, banAuthorUser, activateAuthorUser, deleteAuthorUser,
+} from '@/lib/api/authors';
+import { RejectAuthorModal } from '../components/RejectAuthorModal';
+import { ConfirmActionModal } from '../components/ConfirmActionModal';
 import { formatDate, formatDateTime, formatCurrency } from '@/lib/utils/formatters';
 import type { AuthorDetail } from '@/types/models';
-import { AuthorStatus, BookStatus } from '@/types/models';
+import { AuthorStatus, BookStatus, UserStatus } from '@/types/models';
 
 const statusVariant = {
   [AuthorStatus.PENDING]: 'warning',
@@ -68,6 +74,12 @@ export function AuthorDetailPage() {
   const [author, setAuthor] = useState<AuthorDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [rejectId, setRejectId] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{
+    title: string; description: string; confirmLabel: string;
+    variant: 'danger' | 'primary'; action: () => Promise<void>;
+  } | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -79,6 +91,16 @@ export function AuthorDetailPage() {
         .finally(() => setLoading(false));
     }
   }, [id]);
+
+  const reload = () => {
+    if (!id) return;
+    getAuthorById(id).then(setAuthor).catch(() => {});
+  };
+
+  const withAction = async (fn: () => Promise<void>) => {
+    setActionLoading(true);
+    try { await fn(); reload(); } finally { setActionLoading(false); }
+  };
 
   if (loading) {
     return (
@@ -209,6 +231,98 @@ export function AuthorDetailPage() {
                     Facebook: {author.facebook}
                   </span>
                 )}
+              {/* Action buttons */}
+              <div className="flex flex-wrap gap-2 pt-2 border-t border-outline-variant mt-3">
+                {(() => {
+                  const userStatus = author.user?.status;
+
+                  if (userStatus === UserStatus.SUSPENDED || userStatus === UserStatus.BANNED) {
+                    return (
+                      <Button size="sm" variant="primary" leftIcon={<RotateCcw size={14} />}
+                        isLoading={actionLoading}
+                        onClick={() => setConfirmAction({
+                          title: 'Réactiver le compte',
+                          description: `Réactiver le compte de "${displayName}" ? L'auteur pourra à nouveau se connecter.`,
+                          confirmLabel: 'Réactiver',
+                          variant: 'primary',
+                          action: async () => { await activateAuthorUser(author.userId); reload(); },
+                        })}>
+                        Réactiver le compte
+                      </Button>
+                    );
+                  }
+
+                  return (
+                    <>
+                      {author.status === AuthorStatus.PENDING && (
+                        <>
+                          <Button size="sm" variant="primary" leftIcon={<Check size={14} />}
+                            isLoading={actionLoading}
+                            onClick={() => withAction(() => approveAuthor(author.id))}>
+                            Approuver
+                          </Button>
+                          <Button size="sm" variant="danger" leftIcon={<X size={14} />}
+                            disabled={actionLoading}
+                            onClick={() => setRejectId(author.id)}>
+                            Rejeter
+                          </Button>
+                        </>
+                      )}
+                      {author.status === AuthorStatus.APPROVED && (
+                        <>
+                          <Button size="sm" variant="outline" leftIcon={<ShieldOff size={14} />}
+                            disabled={actionLoading}
+                            onClick={() => setRejectId(author.id)}>
+                            Révoquer le statut
+                          </Button>
+                          <Button size="sm" variant="ghost" leftIcon={<UserX size={14} />}
+                            disabled={actionLoading}
+                            onClick={() => setConfirmAction({
+                              title: 'Suspendre le compte',
+                              description: `Suspendre le compte de "${displayName}" ? L'auteur ne pourra plus se connecter.`,
+                              confirmLabel: 'Suspendre',
+                              variant: 'danger',
+                              action: async () => { await suspendAuthorUser(author.userId); reload(); },
+                            })}>
+                            Suspendre
+                          </Button>
+                          <Button size="sm" variant="danger" leftIcon={<Ban size={14} />}
+                            disabled={actionLoading}
+                            onClick={() => setConfirmAction({
+                              title: 'Bannir le compte',
+                              description: `Bannir définitivement "${displayName}" ? L'auteur ne pourra plus jamais se connecter.`,
+                              confirmLabel: 'Bannir',
+                              variant: 'danger',
+                              action: async () => { await banAuthorUser(author.userId); reload(); },
+                            })}>
+                            Bannir
+                          </Button>
+                        </>
+                      )}
+                      {author.status === AuthorStatus.REJECTED && (
+                        <>
+                          <Button size="sm" variant="primary" leftIcon={<Check size={14} />}
+                            isLoading={actionLoading}
+                            onClick={() => withAction(() => approveAuthor(author.id))}>
+                            Ré-approuver
+                          </Button>
+                          <Button size="sm" variant="danger" leftIcon={<Trash2 size={14} />}
+                            disabled={actionLoading}
+                            onClick={() => setConfirmAction({
+                              title: 'Supprimer le compte',
+                              description: `Supprimer définitivement le compte de "${displayName}" ? Cette action est irréversible.`,
+                              confirmLabel: 'Supprimer',
+                              variant: 'danger',
+                              action: async () => { await deleteAuthorUser(author.userId); navigate('/authors'); },
+                            })}>
+                            Supprimer le compte
+                          </Button>
+                        </>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
               </div>
             </div>
           </div>
@@ -479,6 +593,16 @@ export function AuthorDetailPage() {
           )}
         </div>
       </div>
+      <RejectAuthorModal authorId={rejectId} onClose={() => setRejectId(null)} onSuccess={() => { setRejectId(null); reload(); }} />
+      <ConfirmActionModal
+        isOpen={!!confirmAction}
+        title={confirmAction?.title ?? ''}
+        description={confirmAction?.description ?? ''}
+        confirmLabel={confirmAction?.confirmLabel ?? ''}
+        variant={confirmAction?.variant ?? 'danger'}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={confirmAction?.action ?? (async () => {})}
+      />
     </>
   );
 }
