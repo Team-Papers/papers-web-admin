@@ -258,7 +258,7 @@ export function AuthorDetailPage() {
                         <>
                           <Button size="sm" variant="primary" leftIcon={<Check size={14} />}
                             isLoading={actionLoading}
-                            onClick={() => withAction(() => approveAuthor(author.id))}>
+                            onClick={() => withAction(async () => { await approveAuthor(author.id); })}>
                             Approuver
                           </Button>
                           <Button size="sm" variant="danger" leftIcon={<X size={14} />}
@@ -303,7 +303,7 @@ export function AuthorDetailPage() {
                         <>
                           <Button size="sm" variant="primary" leftIcon={<Check size={14} />}
                             isLoading={actionLoading}
-                            onClick={() => withAction(() => approveAuthor(author.id))}>
+                            onClick={() => withAction(async () => { await approveAuthor(author.id); })}>
                             Ré-approuver
                           </Button>
                           <Button size="sm" variant="danger" leftIcon={<Trash2 size={14} />}

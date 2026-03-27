@@ -70,7 +70,7 @@ export function AuthorsPage() {
   };
 
   const handleApprove = (a: AuthorProfile) =>
-    withLoading(a.id, () => approveAuthor(a.id));
+    withLoading(a.id, async () => { await approveAuthor(a.id); });
 
   const handleSuspend = (a: AuthorProfile) => {
     if (!a.userId) return;
